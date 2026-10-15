@@ -13,3 +13,4 @@
 
 /* Account forms remain readable on narrow screens. */
 #customerAuth,#customerPassword{display:grid;grid-template-columns:1fr 1fr}#customerAuth p,#customerPassword p{grid-column:1/-1}button.text-link{background:none;border:0;cursor:pointer;padding:10px 0;font:inherit;color:#07559c;text-align:left}@media(max-width:600px){#customerAuth,#customerPassword{grid-template-columns:1fr}}
+/* Keep password visibility controls inside the input row. */ .staff-form .password-control{position:relative;width:100%;min-width:0}.staff-form .password-control input{width:100%;box-sizing:border-box;padding-right:155px}.staff-form .password-control button[data-show-password]{position:absolute;right:10px;top:0;height:100%;width:auto;margin:0;padding:0 3px;font-size:12px;white-space:nowrap;max-width:150px}.staff-session{flex-wrap:wrap;gap:12px}#workerAccounts{scroll-margin-top:24px}
