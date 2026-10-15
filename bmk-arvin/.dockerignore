@@ -9,3 +9,5 @@
 !assets/
 !assets/**
 !entrypoint.sh
+
+!commerce.py

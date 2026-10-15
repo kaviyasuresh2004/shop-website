@@ -33,7 +33,7 @@ def install(server):
   customer = current()
   if not customer: return jsonify(error='Customer sign in required'), 401
   with domain.connect() as c:
-   orders = [dict(r) for r in c.execute('SELECT s.id,s.items,s.total,s.delivery,s.created,d.status,d.zone,d.address FROM sales s JOIN order_owners o ON o.sale=s.id JOIN order_details d ON d.sale=s.id WHERE o.customer=? ORDER BY s.id DESC LIMIT 200', (customer['id'],))]
+   orders = [dict(r) for r in c.execute("SELECT s.id,s.items,s.total,s.delivery,s.created,d.status,d.zone,d.address,COALESCE(p.method,'manual') AS payment_method,COALESCE(p.status,'unrecorded') AS payment_status FROM sales s JOIN order_owners o ON o.sale=s.id JOIN order_details d ON d.sale=s.id LEFT JOIN order_payments p ON p.sale=s.id WHERE o.customer=? ORDER BY s.id DESC LIMIT 200", (customer['id'],))]
   for order in orders: order['items'] = json.loads(order['items'])
   return jsonify(customer={k:customer[k] for k in ('id','email','name','phone','address')}, orders=orders)
 

@@ -25,7 +25,7 @@ vm.runInContext(fs.readFileSync('assets/i18n.js','utf8'),context);
  vm.runInContext("deliveryZones[1]='Tutong';saveCart();cart=[];readCart()",context);assert.equal(vm.runInContext('total()',context),18800);
  const cartKey=[...storage.keys()].find(k=>k.endsWith('-cart'));storage.set(cartKey,JSON.stringify([{company:2,product:1,qty:1},{company:1,product:1,qty:-1}]));vm.runInContext('readCart()',context);assert.equal(vm.runInContext('cart.length',context),0);
  storage.set(cartKey,'bad');vm.runInContext('readCart()',context);assert.equal(vm.runInContext('cart.length',context),0);
- vm.runInContext("data.preview=true;checkout()",context);assert.ok(element('infoContent').innerHTML.includes(en.previewOrders));assert.ok(!element('infoContent').innerHTML.includes('checkoutForm'));
+ vm.runInContext("data.preview=true;checkout()",context);assert.ok(element('infoContent').innerHTML.includes(en.checkoutNotActive));assert.ok(element('infoContent').innerHTML.includes('checkoutForm'));assert.ok(element('infoContent').innerHTML.includes('disabled'));assert.ok(element('infoContent').innerHTML.includes('value="cod"'));
  vm.runInContext("data.preview=false;checkout({customer:'Draft customer',phone:'123',address:'Draft address'})",context);
  assert.ok(element('infoContent').innerHTML.includes('checkoutForm'));listeners.languagechange();
  assert.equal(element('checkoutForm').elements.customer.value,'Draft customer');assert.equal(element('checkoutForm').elements.phone.value,'123');assert.ok(element('infoContent').innerHTML.includes('checkoutForm'));

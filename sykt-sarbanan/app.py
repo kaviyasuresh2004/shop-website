@@ -1,4 +1,5 @@
 import mimetypes
+import commerce
 from datetime import datetime, timezone
 from urllib.parse import urlsplit, unquote
 import csv, hashlib, hmac, io, json, os, secrets, sqlite3, threading
@@ -40,6 +41,7 @@ def init():
    c.executemany('INSERT INTO products VALUES (?,?,?,?,?)',[(1,'DRILL-001','Cordless drill kit','Power tools',8900),(2,'PAINT-001','Interior paint · 5 litres','Paint',3200),(3,'CEMENT-001','Portland cement · 50 kg','Building materials',850),(4,'PIPE-001','PVC pipe · 3 metres','Plumbing',650),(5,'HAMMER-001','Claw hammer','Hand tools',1200),(6,'WIRE-001','Electrical cable · 10 metres','Electrical',1800)])
    c.executemany('INSERT INTO stock VALUES (?,?,?)',[(company,p,30 if company==1 else 20) for company in (1,) for p in range(1,7)])
    audit(c,'system','setup','Sample catalogue and stock created; replace before real use')
+  commerce.initialize(c)
   companies=c.execute('SELECT id,name FROM companies').fetchall()
   if len(companies)!=1 or companies[0]['id']!=1 or companies[0]['name']!=CONFIG['name']: raise ValueError('Database identity mismatch: use only this shop database')
 def audit(c,actor,action,detail): c.execute('INSERT INTO audit(actor,action,detail) VALUES (?,?,?)',(actor,action,json.dumps(detail)))
@@ -85,7 +87,7 @@ def operation(user,kind,d,*,customer_id=None):
    items=d['items']; customer=d.get('customer','').strip(); zone=d.get('zone','pickup')
    if not customer or not items: raise ValueError('Customer and items required')
    if not isinstance(items,list) or len(items)>100 or len(customer)>200 or len(d.get('phone',''))>80 or len(d.get('address',''))>1000: raise ValueError('Invalid order details')
-   fees={'pickup':0,'Brunei-Muara':500,'Tutong':1000,'Belait':1500,'Temburong':2000}
+   fees=commerce.load(c)['delivery_fees']
    if zone not in fees: raise ValueError('Unknown delivery region')
    total=fees[zone]; combined={}
    for item in items:
@@ -100,7 +102,10 @@ def operation(user,kind,d,*,customer_id=None):
     unit_price=effective_price(c,row,company); total+=unit_price*q; lines.append({'product':p,'sku':row['sku'],'qty':q,'unit_price':unit_price})
    sale=c.execute('INSERT INTO sales(company,customer,items,total,delivery) VALUES (?,?,?,?,?)',(company,customer,json.dumps(lines),total,fees[zone])).lastrowid
    c.execute('INSERT INTO order_details(sale,channel,address,phone,zone,status) VALUES (?,?,?,?,?,?)',(sale,'online' if kind=='order' else 'shop',d.get('address','').strip(),d.get('phone','').strip(),zone,'pending' if kind=='order' else 'completed'))
-   if customer_id is not None: c.execute('INSERT INTO order_owners VALUES (?,?)',(sale,customer_id))
+   if customer_id is not None:
+    c.execute('INSERT INTO order_owners VALUES (?,?)',(sale,customer_id))
+    if d.get('payment_method','cod')!='cod':raise ValueError('Unsupported payment method')
+    c.execute('INSERT INTO order_payments VALUES (?,?,?)',(sale,'cod','pending'))
    result={'sale':sale,'total':total}
    if request_key: c.execute('INSERT INTO order_requests VALUES (?,?,?)',(request_key,fingerprint,json.dumps(result)))
    audit(c,user['name'],'order received' if kind=='order' else 'completed sale',{'sale':sale,'company':company,'zone':zone}); return result
@@ -118,6 +123,10 @@ def operation(user,kind,d,*,customer_id=None):
    pid=integer(d['product'])
    c.execute('DELETE FROM promotions WHERE product=?',(pid,)); c.execute('DELETE FROM stock WHERE id=?',(pid,)); c.execute('DELETE FROM products WHERE id=?',(pid,))
    audit(c,user['name'],'product deleted',{'product':pid})
+  elif kind=='payment_received':
+   sale=integer(d['sale'])
+   if c.execute("UPDATE order_payments SET status='paid' WHERE sale=? AND method='cod'",(sale,)).rowcount!=1:raise ValueError('Unknown COD order')
+   audit(c,user['name'],'cash collected',{'sale':sale})
   elif kind=='order_status':
    if d['status'] not in ('pending','processing','ready','delivered','completed'): raise ValueError('Invalid order status')
    if c.execute('UPDATE order_details SET status=? WHERE sale=?',(d['status'],integer(d['sale']))).rowcount!=1: raise ValueError('Unknown order')
