@@ -33,11 +33,11 @@ Each app creates `data/shop.db` inside its own folder on first startup. The firs
 
 ## Current launch status
 
-**Not deployed.** Railway cost optimization was deferred at the owner's request. Do not deploy either new website until that review and optimization are complete. The existing business website and production databases were not changed by preparing this repository.
+Both shops are deployed separately on Railway in preview mode, each with its own persistent volume. BMK: https://bmk-arvin-production.up.railway.app — Sarbanan: https://sykt-sarbanan-production.up.railway.app. Idle sleeping is enabled.
 
 Both shop apps default to `SHOP_MODE=preview`, which blocks customer checkout on the server. Sample catalogue, BND currency, delivery rates, business contact details and policy placeholders must be verified before real orders. Run each shop in a separate Railway service with its own persistent volume; configure that service's Root Directory to its corresponding folder in this repository. Never deploy the combined repository root as one shop, and never share database volumes. See each folder's `RAILWAY_DEPLOYMENT.md` for production setup, protected first-admin setup, HTTPS origins, health checks and backups.
 
-Manual payment arrangements only. No online payment provider, customer accounts, automated Tally connection, financial reversal workflow or full purchase/accounting reports are implemented. The existing Tally-compatible stock importer supports CSV UTF-8 `SKU,Quantity` snapshots for existing products. Full catalogue/price import mapping awaits separately supplied exports from each company.
+Manual payment arrangements only. Customer registration, login, private order history, and account-required checkout are implemented. See ACCOUNT_SETUP.md for protected administrator recovery and limitations. No online payment provider, automated Tally connection, financial reversal workflow or full purchase/accounting reports are implemented. The existing Tally-compatible stock importer supports CSV UTF-8 `SKU,Quantity` snapshots for existing products. Full catalogue/price import mapping awaits separately supplied exports from each company.
 
 ## Verification
 

@@ -10,6 +10,7 @@ class ServerTests(unittest.TestCase):
   self.production=server.PRODUCTION;self.preview=server.PREVIEW;self.url=server.PUBLIC_URL
   server.PRODUCTION=False;server.PREVIEW=False;server.PUBLIC_URL='';server.LIMITS.clear()
   server.initialize();server.web.config['TESTING']=True;self.client=server.web.test_client()
+  self.client.post('/api/customer/register',json={'email':'test@example.test','name':'Test customer','password':'customer-test-password'})
  def tearDown(self):
   app.DB=self.original;server.PRODUCTION=self.production;server.PREVIEW=self.preview;server.PUBLIC_URL=self.url;self.tmp.cleanup()
  def post(self,kind,data,**kw): return self.client.post('/api/'+kind,json=data,**kw)

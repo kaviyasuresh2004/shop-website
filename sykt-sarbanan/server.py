@@ -18,6 +18,7 @@ def initialize():
  if PRODUCTION and not os.environ.get('DATA_DIR'): raise RuntimeError('DATA_DIR must point to this service persistent volume')
  if os.environ.get('RAILWAY_ENVIRONMENT_ID') and os.environ.get('RAILWAY_VOLUME_MOUNT_PATH')!=os.environ.get('DATA_DIR'): raise RuntimeError('Attach a separate Railway volume matching DATA_DIR before starting')
  domain.init()
+ initialize_accounts()
  with domain.connect() as c:
   c.execute('CREATE TABLE IF NOT EXISTS web_sessions(token TEXT PRIMARY KEY,username TEXT REFERENCES users(name) ON DELETE CASCADE,expires INTEGER)')
 
@@ -62,7 +63,7 @@ def headers(response):
  response.headers['X-Frame-Options']='DENY'
  response.headers['Referrer-Policy']='strict-origin-when-cross-origin'
  response.headers['Content-Security-Policy']="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
- if request.path.startswith('/api/'): response.headers['Cache-Control']='no-store'
+ if request.path.startswith('/api/') or request.path=='/staff': response.headers['Cache-Control']='no-store'
  if PRODUCTION: response.headers['Strict-Transport-Security']='max-age=31536000'
  return response
 
@@ -108,18 +109,24 @@ def action(kind):
      if c.execute('SELECT 1 FROM users').fetchone(): raise ValueError('Setup already completed')
      if not name or len(name)>100 or len(password)<12: raise ValueError('Use a username and password of at least 12 characters')
      salt=secrets.token_hex(16);c.execute('INSERT INTO users VALUES (?,?,?,?,1)',(name,salt,domain.password_hash(password,salt),'admin'));domain.audit(c,name,'admin setup',{})
-    row=c.execute('SELECT * FROM users WHERE name=?',(name,)).fetchone()
+    rows=c.execute('SELECT * FROM users WHERE lower(name)=lower(?)',(name,)).fetchall()
+    row=rows[0] if len(rows)==1 else None
     if not row or not hmac.compare_digest(row['password'],domain.password_hash(password,row['salt'])): return jsonify(error='Invalid credentials'),401
     token=secrets.token_urlsafe(32);digest=hashlib.sha256(token.encode()).hexdigest()
     c.execute('DELETE FROM web_sessions WHERE expires<=?',(int(time.time()),))
-    c.execute('INSERT INTO web_sessions VALUES (?,?,?)',(digest,name,int(time.time())+SESSION_TTL))
+    c.execute('INSERT INTO web_sessions VALUES (?,?,?)',(digest,row['name'],int(time.time())+SESSION_TTL))
    response=jsonify(ok=True);response.set_cookie(domain.COOKIE,token,max_age=SESSION_TTL,httponly=True,secure=PRODUCTION,samesite='Strict',path='/');return response
   if kind=='order':
+   customer=current_customer()
+   if not customer: return jsonify(error='Customer sign in required'),401
    if PREVIEW: return jsonify(error='Preview only. Customer orders are not enabled.'),403
    if rate_limited('order',10): return jsonify(error='Too many orders. Try again later.'),429
    if not d.get('phone','').strip() or (d.get('zone','pickup')!='pickup' and not d.get('address','').strip()): raise ValueError('Phone and delivery address required')
    if not d.get('request_id'): raise ValueError('Order request ID required')
-   return jsonify(domain.operation({'name':'customer','role':'customer','company':1},kind,d))
+   d=dict(d); d['customer']=customer['name']
+   if not isinstance(d['request_id'],str) or not 16<=len(d['request_id'])<=128: raise ValueError()
+   d['request_id']=hashlib.sha256((str(customer['id'])+':'+d['request_id']).encode()).hexdigest()
+   return jsonify(domain.operation({'name':customer['email'],'role':'customer','company':1},kind,d,customer_id=customer['id']))
   user=signed_in()
   if not user: return jsonify(error='Sign in required'),401
   if kind=='logout':
@@ -142,5 +149,8 @@ def serve():
  initialize();port=int(os.environ.get('PORT',domain.CONFIG['port']))
  print(f"{domain.CONFIG['name']} listening on port {port}",flush=True)
  run(web,host='0.0.0.0' if PRODUCTION else '127.0.0.1',port=port,threads=8)
+
+import accounts
+initialize_accounts,current_customer=accounts.install(__import__(__name__))
 
 if __name__=='__main__': serve()

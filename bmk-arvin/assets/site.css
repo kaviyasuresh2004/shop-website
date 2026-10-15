@@ -8,3 +8,6 @@
 .hero-wrap{grid-template-columns:1fr}.shops-grid{grid-template-columns:1fr}.staff-company{display:none}
 
 .brand{white-space:normal;max-width:300px;font-size:19px}.brand span{overflow-wrap:anywhere}.footer-brand{max-width:none}@media(max-width:600px){.header .brand{font-size:14px;max-width:60%}.staff-header .brand{max-width:58%;font-size:14px}.staff-header .header{gap:10px}.staff-header .header-actions{font-size:12px}.product-card .stock-name{white-space:normal;font-size:10px}}
+
+/* Account forms remain readable on narrow screens. */
+#customerAuth,#customerPassword{display:grid;grid-template-columns:1fr 1fr}#customerAuth p,#customerPassword p{grid-column:1/-1}button.text-link{background:none;border:0;cursor:pointer;padding:10px 0;font:inherit;color:#07559c;text-align:left}@media(max-width:600px){#customerAuth,#customerPassword{grid-template-columns:1fr}}

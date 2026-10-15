@@ -61,7 +61,7 @@ def effective_price(c,product,company):
  for r in c.execute("SELECT * FROM promotions WHERE active=1 AND kind='discount' AND product=? AND company=?",(product['id'],company)):
   if promotion_valid(r) and 0<=r['price']<product['price']: prices.append(r['price'])
  return min(prices)
-def operation(user,kind,d):
+def operation(user,kind,d,*,customer_id=None):
  if user['role']=='customer' and kind!='order': raise ValueError('Not authorized')
  with LOCK,connect() as c:
   c.execute('BEGIN IMMEDIATE')
@@ -100,6 +100,7 @@ def operation(user,kind,d):
     unit_price=effective_price(c,row,company); total+=unit_price*q; lines.append({'product':p,'sku':row['sku'],'qty':q,'unit_price':unit_price})
    sale=c.execute('INSERT INTO sales(company,customer,items,total,delivery) VALUES (?,?,?,?,?)',(company,customer,json.dumps(lines),total,fees[zone])).lastrowid
    c.execute('INSERT INTO order_details(sale,channel,address,phone,zone,status) VALUES (?,?,?,?,?,?)',(sale,'online' if kind=='order' else 'shop',d.get('address','').strip(),d.get('phone','').strip(),zone,'pending' if kind=='order' else 'completed'))
+   if customer_id is not None: c.execute('INSERT INTO order_owners VALUES (?,?)',(sale,customer_id))
    result={'sale':sale,'total':total}
    if request_key: c.execute('INSERT INTO order_requests VALUES (?,?,?)',(request_key,fingerprint,json.dumps(result)))
    audit(c,user['name'],'order received' if kind=='order' else 'completed sale',{'sale':sale,'company':company,'zone':zone}); return result
@@ -158,6 +159,7 @@ def operation(user,kind,d):
    if user['role']!='admin': raise ValueError('Only admin can create workers')
    name=d['name'].strip(); p=d['password']
    if not name or len(name)>100 or not 12<=len(p)<=256: raise ValueError('Username and password of at least 12 characters required')
+   if c.execute('SELECT 1 FROM users WHERE lower(name)=lower(?)',(name,)).fetchone(): raise ValueError('Username already exists')
    salt=secrets.token_hex(16); c.execute('INSERT INTO users VALUES (?,?,?,?,?)',(name,salt,password_hash(p,salt),'worker',company)); audit(c,user['name'],'worker created',{'name':name,'company':company})
   elif kind=='manage_user':
    if user['role']!='admin': raise ValueError('Only admin can manage accounts')
@@ -209,6 +211,7 @@ class Handler(BaseHTTPRequestHandler):
       if c.execute('SELECT 1 FROM users').fetchone(): raise ValueError('Setup already completed')
       p=d['password']; name=d['name'].strip(); d['name']=name
       if not name or len(p)<12: raise ValueError('Use a username and password of at least 12 characters')
+      if c.execute('SELECT 1 FROM users WHERE lower(name)=lower(?)',(name,)).fetchone(): raise ValueError('Username already exists')
       salt=secrets.token_hex(16); c.execute('INSERT INTO users VALUES (?,?,?,?,?)',(name,salt,password_hash(p,salt),'admin',1)); audit(c,name,'admin setup',{})
      row=c.execute('SELECT * FROM users WHERE name=?',(d['name'],)).fetchone()
      if not row or not hmac.compare_digest(row['password'],password_hash(d['password'],row['salt'])): return self.respond({'error':'Invalid credentials'},401)

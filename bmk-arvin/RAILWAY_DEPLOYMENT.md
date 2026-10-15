@@ -25,10 +25,12 @@ Export BMK and Sarbanan separately. Provide each company’s stock-item export w
 
 The existing staff stock importer accepts only CSV UTF-8 `SKU,Quantity` for already-existing SKUs and replaces quantities atomically. It is not a full catalogue importer or a live Tally integration. Validate any fractional units and currency conversion before importing; current quantities are whole numbers and prices are integer cents. A separate offline migration utility remains available for the old combined database; it refuses to overwrite a destination database and filters by company.
 
-Before enabling `SHOP_MODE=live`, import/reconcile the independent real catalogues, quantities and prices; configure approved delivery coverage/fees and contact details; complete privacy/returns/delivery policy text; create workers; verify payments arranged manually and order processing. Online payments, customer accounts, automated Tally synchronization, purchasing/accounting reports and financial reversals are not implemented. Do not enable live checkout while sample data or placeholder policies remain.
+Before enabling `SHOP_MODE=live`, import/reconcile the independent real catalogues, quantities and prices; configure approved delivery coverage/fees and contact details; complete privacy/returns/delivery policy text; create workers; verify payments arranged manually and order processing. Online payments, automated Tally synchronization, purchasing/accounting reports and financial reversals are not implemented. Do not enable live checkout while sample data or placeholder policies remain.
 
 ## Verification
 
 `python -m unittest -v test_isolation test_server` checks isolation, migration, role boundaries, stock rollback, HTTPS origins, protected setup, durable/expiring sessions, password-change session revocation, checkout preview block, rate limiting, duplicate orders, server-side pricing, pending-order reporting and path traversal. `node test_frontend.cjs` checks both dictionaries, static UI references, language preference, cart behavior, discounts and preview checkout logic. `node --check` verifies script syntax.
 
 Browser visual inspection was blocked by the browser tool's URL security policy. Automated script checks are not a substitute for an end-to-end browser/mobile accessibility inspection. Review both desktop and mobile layouts before live cutover.
+
+Customer accounts and owner-authorized administrator recovery are now available. See ../ACCOUNT_SETUP.md. ADMIN_RECOVERY_TOKEN is optional, must contain at least 32 random characters, and must be removed after recovery. Existing accounts and records are preserved.
