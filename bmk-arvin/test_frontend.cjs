@@ -1,0 +1,34 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+process.chdir(__dirname);
+const en=JSON.parse(fs.readFileSync('assets/en.json','utf8')),ms=JSON.parse(fs.readFileSync('assets/ms.json','utf8'));
+assert.deepEqual(Object.keys(en).sort(),Object.keys(ms).sort());
+for(const [htmlName,jsName] of [['index.html','site.js'],['staff.html','staff.js']]){
+ const html=fs.readFileSync(htmlName,'utf8'),js=fs.readFileSync('assets/'+jsName,'utf8');
+ const ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(x=>x[1]));
+ assert.equal(ids.size,[...html.matchAll(/\bid="([^"]+)"/g)].length,'Duplicate IDs in '+htmlName);
+ for(const [,key] of html.matchAll(/data-(?:t|ph|aria)="([^"]+)"/g))assert.ok(en[key]&&ms[key],`${htmlName}: missing ${key}`);
+ const dynamic=new Set(['detailSeller','detailAdd','detailPrice','reviewOrder','checkoutForm','checkoutError']);
+ for(const [,id] of js.matchAll(/\$\('([^']+)'\)/g))assert.ok(ids.has(id)||dynamic.has(id),`${jsName}: missing element ${id}`);
+ assert.ok(!html.includes('SAR BAN')&&!html.includes('SYKT PG. SARBANUN'));
+}
+const selectors=new Map(),events=[],listeners={},storage=new Map();
+const element=id=>selectors.get(id)||selectors.set(id,{value:'',innerHTML:'',textContent:'',hidden:true,open:false,dataset:{},elements:{customer:{value:''},phone:{value:''},address:{value:''}},classList:{toggle(){}},setAttribute(){},addEventListener(){},querySelectorAll(){return []},showModal(){this.open=true},close(){this.open=false},scrollIntoView(){}}).get(id);
+element('company').value='1';element('sort').value='featured';
+const context={console,setTimeout,clearTimeout,Date,Map,Set,JSON,Object,Number,String,Math,FormData:class{constructor(form){this.form=form}*[Symbol.iterator](){for(const [k,v] of Object.entries(this.form.elements))yield [k,v.value]}},CustomEvent:class{constructor(n){this.name=n}},navigator:{language:'ms-BN'},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},document:{documentElement:{},getElementById:element,querySelectorAll:()=>[],addEventListener:(name,fn)=>listeners[name]=fn,dispatchEvent:e=>events.push(e.name)},fetch:async url=>({ok:true,json:async()=>url.includes('/en.')?en:url.includes('/ms.')?ms:{}})};context.window=context;vm.createContext(context);
+vm.runInContext(fs.readFileSync('assets/i18n.js','utf8'),context);
+(async()=>{
+ await context.siteReady;assert.equal(vm.runInContext('I18n.language',context),'ms');
+ vm.runInContext("I18n.set('en')",context);const languageKey=[...storage.keys()].find(k=>k.endsWith('-language'));assert.equal(storage.get(languageKey),'en');
+ vm.runInContext(fs.readFileSync('assets/site.js','utf8').replace(/^start\(\);$/m,''),context);
+ vm.runInContext(`data={companies:[{id:1,name:'Shop'}],products:[{id:1,name:'Drill',price:8900,category:'Power tools',sku:'D'}],stock:[{id:1,company:1,qty:2}],promotions:[]};add(1,1);add(1,1);add(1,1);`,context);
+ assert.equal(vm.runInContext('cart.length',context),1);assert.equal(vm.runInContext('cart[0].qty',context),2);assert.equal(vm.runInContext('total()',context),17800);
+ vm.runInContext("deliveryZones[1]='Tutong';saveCart();cart=[];readCart()",context);assert.equal(vm.runInContext('total()',context),18800);
+ const cartKey=[...storage.keys()].find(k=>k.endsWith('-cart'));storage.set(cartKey,JSON.stringify([{company:2,product:1,qty:1},{company:1,product:1,qty:-1}]));vm.runInContext('readCart()',context);assert.equal(vm.runInContext('cart.length',context),0);
+ storage.set(cartKey,'bad');vm.runInContext('readCart()',context);assert.equal(vm.runInContext('cart.length',context),0);
+ vm.runInContext("data.preview=true;checkout()",context);assert.ok(element('infoContent').innerHTML.includes(en.previewOrders));assert.ok(!element('infoContent').innerHTML.includes('checkoutForm'));
+ vm.runInContext("data.preview=false;checkout({customer:'Draft customer',phone:'123',address:'Draft address'})",context);
+ assert.ok(element('infoContent').innerHTML.includes('checkoutForm'));listeners.languagechange();
+ assert.equal(element('checkoutForm').elements.customer.value,'Draft customer');assert.equal(element('checkoutForm').elements.phone.value,'123');assert.ok(element('infoContent').innerHTML.includes('checkoutForm'));
+ const now=Date.now();vm.runInContext(`data.promotions=[{kind:'discount',active:1,company:1,product:1,price:5000,start:new Date(${now}-60000).toISOString(),end:new Date(${now}+60000).toISOString()}]`,context);assert.equal(vm.runInContext('price(data.products[0],1)',context),5000);
+ console.log('PASS: dictionary coverage, static element references, unique IDs, browser-language suggestion, language persistence, independent cart, stock limit, delivery totals, corrupt storage, preview checkout block, active discount.');
+})().catch(e=>{console.error(e);process.exitCode=1});

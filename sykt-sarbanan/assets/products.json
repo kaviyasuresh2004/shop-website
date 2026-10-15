@@ -1,0 +1,38 @@
+{
+  "1": {
+    "brand": "",
+    "description_en": "Sample cordless drill kit for drilling and fastening. Confirm voltage, torque and included accessories before purchase.",
+    "description_ms": "Kit gerudi tanpa wayar contoh untuk menggerudi dan memasang pengikat. Sahkan voltan, tork dan aksesori sebelum membeli.",
+    "image_index": 0
+  },
+  "2": {
+    "brand": "",
+    "description_en": "Sample 5-litre interior paint. Confirm colour, coverage and finish with the shop.",
+    "description_ms": "Cat dalaman 5 liter contoh. Sahkan warna, liputan dan kemasan dengan kedai.",
+    "image_index": 1
+  },
+  "3": {
+    "brand": "",
+    "description_en": "Sample 50 kg cement bag for construction projects. Actual grade and brand require confirmation.",
+    "description_ms": "Beg simen 50 kg contoh untuk projek pembinaan. Gred dan jenama sebenar perlu disahkan.",
+    "image_index": 2
+  },
+  "4": {
+    "brand": "",
+    "description_en": "Sample 3-metre PVC pipe. Confirm diameter, pressure rating and suitable fittings.",
+    "description_ms": "Paip PVC 3 meter contoh. Sahkan diameter, kadar tekanan dan kelengkapan yang sesuai.",
+    "image_index": 3
+  },
+  "5": {
+    "brand": "",
+    "description_en": "Sample claw hammer for general hand-tool tasks. Confirm weight and handle specification.",
+    "description_ms": "Tukul kuku contoh untuk kerja am. Sahkan berat dan spesifikasi pemegang.",
+    "image_index": 4
+  },
+  "6": {
+    "brand": "",
+    "description_en": "Sample 10-metre electrical cable. Confirm conductor size and approved application with a qualified electrician.",
+    "description_ms": "Kabel elektrik 10 meter contoh. Sahkan saiz konduktor dan kegunaan yang diluluskan dengan juruelektrik bertauliah.",
+    "image_index": 5
+  }
+}

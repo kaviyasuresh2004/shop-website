@@ -1,0 +1,11 @@
+data/
+*.db
+*.db-*
+*.log
+__pycache__/
+.venv/
+.dependencies/
+.env
+.env.*
+test-results/
+.git/

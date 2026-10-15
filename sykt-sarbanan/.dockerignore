@@ -1,0 +1,10 @@
+*
+!requirements.txt
+!app.py
+!server.py
+!shop.json
+!index.html
+!staff.html
+!assets/
+!assets/**
+!entrypoint.sh
