@@ -295,7 +295,7 @@
   "price": "Price",
   "adminControls": "Administrator controls",
   "deleteProduct": "Delete product",
-  "resetPassword": "New password (leave empty to remove account)",
+  "resetPassword": "New password (at least 12 characters)",
   "updateAccount": "Update account",
   "confirmDelete": "Delete this product? Sales history will remain.",
   "confirmAccountDelete": "Remove this account?",
@@ -334,5 +334,17 @@
   "changePassword": "Change password",
   "passwordChanged": "Password changed. Other sessions have been signed out.",
   "errCustomerLogin": "Please sign in to your customer account.",
-  "errRecovery": "Recovery is unavailable or the token is incorrect or already used. Ask the owner to configure a new recovery token."
+  "errRecovery": "Recovery is unavailable or the token is incorrect or already used. Ask the owner to configure a new recovery token.",
+  "staffAccounts": "Staff accounts",
+  "accountAction": "Action",
+  "resetWorkerPassword": "Reset password",
+  "removeAccount": "Remove account",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "workerPasswordHelp": "Stored passwords cannot be viewed. Select an account below to set a new password, then sign in at /staff using that username and the new password. Use a separate browser or sign out first to test the worker login.",
+  "workerCreatedDetails": "Worker saved: {name} · {shop}. Use this username and the password you entered to sign in.",
+  "workerResetDetails": "Password saved for {name} · {shop}. Previous sessions have been signed out. Sign in using the new password.",
+  "workerRemovedDetails": "Account removed: {name} · {shop}.",
+  "colRole": "Role",
+  "workerNameHelp": "Save this username and password before continuing. The setup token is not a worker password."
 }

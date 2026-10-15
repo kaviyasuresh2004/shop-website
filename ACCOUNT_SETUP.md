@@ -16,6 +16,10 @@ Use the account's assigned password, not a setup token. Usernames now ignore let
 
 Workers ask their administrator to reset their password using account management. First-time administrator creation continues to use `SETUP_TOKEN`; it cannot reset an existing administrator.
 
+The administrator's Staff accounts table shows saved usernames, roles and shops without exposing password hashes. Select the worker, choose Reset password, enter a new password and save. Use Show password while entering it if needed. The previous password stops working and existing worker sessions are revoked. Test using the displayed username at `/staff` after signing out or in another browser. Saved passwords cannot be retrieved later; reset them if lost. Removing an account is a separate explicit action and is never triggered by leaving the reset-password field blank.
+
+Delivered and Completed online orders both count once in completed-sales totals. Changing order status does not deduct stock again. The manual completed-sale form remains for physical-shop sales; do not record a website order a second time there.
+
 ## Customers
 
 The storefront Account button now offers registration and login. Customers register with their name, email and a password of at least 12 characters; phone and delivery address can also be saved at registration. Customers can see only their own new online orders and change their password using their current password. Customer sessions cannot access staff endpoints, and staff sessions cannot substitute for a customer at checkout. There is no email verification or forgotten-customer-password email service yet; do not represent email addresses as verified.

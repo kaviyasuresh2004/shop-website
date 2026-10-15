@@ -160,20 +160,24 @@ def operation(user,kind,d,*,customer_id=None):
    name=d['name'].strip(); p=d['password']
    if not name or len(name)>100 or not 12<=len(p)<=256: raise ValueError('Username and password of at least 12 characters required')
    if c.execute('SELECT 1 FROM users WHERE lower(name)=lower(?)',(name,)).fetchone(): raise ValueError('Username already exists')
-   salt=secrets.token_hex(16); c.execute('INSERT INTO users VALUES (?,?,?,?,?)',(name,salt,password_hash(p,salt),'worker',company)); audit(c,user['name'],'worker created',{'name':name,'company':company})
+   salt=secrets.token_hex(16); c.execute('INSERT INTO users VALUES (?,?,?,?,?)',(name,salt,password_hash(p,salt),'worker',company)); audit(c,user['name'],'worker created',{'name':name,'company':company}); return {'ok':True,'name':name,'role':'worker','company':company}
   elif kind=='manage_user':
    if user['role']!='admin': raise ValueError('Only admin can manage accounts')
    name=d['name'].strip()
+   accounts=c.execute('SELECT name,role,company FROM users WHERE lower(name)=lower(?)',(name,)).fetchall()
+   if len(accounts)!=1: raise ValueError('Unknown account')
+   name=accounts[0]['name']
    if name==user['name']: raise ValueError('Cannot remove your own account')
    if d.get('password'):
     if not 12<=len(d['password'])<=256: raise ValueError('Password must be at least 12 characters')
     salt=secrets.token_hex(16)
     if c.execute('UPDATE users SET salt=?,password=? WHERE name=?',(salt,password_hash(d['password'],salt),name)).rowcount!=1: raise ValueError('Unknown account')
    else:
+    if d.get('action')!='delete': raise ValueError('Password required for reset')
     if c.execute('DELETE FROM users WHERE name=?',(name,)).rowcount!=1: raise ValueError('Unknown account')
    for token in list(SESSIONS):
     if SESSIONS[token]['name']==name: del SESSIONS[token]
-   audit(c,user['name'],'account updated',{'name':name})
+   audit(c,user['name'],'account updated',{'name':name,'action':'password reset' if d.get('password') else 'removed'}); return {'ok':True,'name':name}
   else: raise ValueError('Unknown operation')
  return {'ok':True}
 class Handler(BaseHTTPRequestHandler):

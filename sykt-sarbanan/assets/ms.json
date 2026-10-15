@@ -265,7 +265,7 @@
   "price": "Harga",
   "adminControls": "Kawalan pentadbir",
   "deleteProduct": "Padam produk",
-  "resetPassword": "Kata laluan baharu (kosongkan untuk padam akaun)",
+  "resetPassword": "Kata laluan baharu (sekurang-kurangnya 12 aksara)",
   "updateAccount": "Kemas kini akaun",
   "confirmDelete": "Padam produk ini? Sejarah jualan dikekalkan.",
   "confirmAccountDelete": "Padam akaun ini?",
@@ -304,5 +304,17 @@
   "changePassword": "Tukar kata laluan",
   "passwordChanged": "Kata laluan ditukar. Sesi lain telah dilog keluar.",
   "errCustomerLogin": "Sila log masuk ke akaun pelanggan anda.",
-  "errRecovery": "Pemulihan tidak tersedia atau token salah atau sudah digunakan. Minta pemilik menetapkan token pemulihan baharu."
+  "errRecovery": "Pemulihan tidak tersedia atau token salah atau sudah digunakan. Minta pemilik menetapkan token pemulihan baharu.",
+  "staffAccounts": "Akaun kakitangan",
+  "accountAction": "Tindakan",
+  "resetWorkerPassword": "Tetapkan semula kata laluan",
+  "removeAccount": "Padam akaun",
+  "showPassword": "Tunjukkan kata laluan",
+  "hidePassword": "Sembunyikan kata laluan",
+  "workerPasswordHelp": "Kata laluan tersimpan tidak boleh dilihat. Pilih akaun di bawah untuk menetapkan kata laluan baharu, kemudian log masuk di /staff menggunakan nama pengguna dan kata laluan baharu. Gunakan pelayar berasingan atau log keluar dahulu untuk menguji akaun pekerja.",
+  "workerCreatedDetails": "Pekerja disimpan: {name} · {shop}. Log masuk dengan nama pengguna ini dan kata laluan yang anda masukkan.",
+  "workerResetDetails": "Kata laluan disimpan untuk {name} · {shop}. Sesi terdahulu telah dilog keluar. Log masuk menggunakan kata laluan baharu.",
+  "workerRemovedDetails": "Akaun dipadam: {name} · {shop}.",
+  "colRole": "Peranan",
+  "workerNameHelp": "Simpan nama pengguna dan kata laluan ini sebelum meneruskan. Token persediaan bukan kata laluan pekerja."
 }

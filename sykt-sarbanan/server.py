@@ -88,9 +88,10 @@ def staff():
  user=signed_in()
  if not user: return jsonify(error='Sign in required'),401
  with domain.connect() as c:
-  report=dict(c.execute("SELECT COUNT(*) AS sales,COALESCE(SUM(s.total),0) AS total FROM sales s LEFT JOIN order_details d ON d.sale=s.id WHERE d.sale IS NULL OR d.status='completed'").fetchone())
-  report.update(dict(c.execute("SELECT COUNT(*) AS pending_orders,COALESCE(SUM(s.total),0) AS pending_total FROM sales s JOIN order_details d ON d.sale=s.id WHERE d.channel='online' AND d.status!='completed'").fetchone()))
-  return jsonify(user=user,sales=[dict(r) for r in c.execute('SELECT * FROM sales ORDER BY id DESC')],orders=[dict(r) for r in c.execute('SELECT * FROM order_details ORDER BY sale DESC')],audit=[dict(r) for r in c.execute('SELECT * FROM audit ORDER BY id DESC LIMIT 100')] if user['role']=='admin' else [],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions ORDER BY id DESC')],report=report)
+  report=dict(c.execute("SELECT COUNT(*) AS sales,COALESCE(SUM(s.total),0) AS total FROM sales s LEFT JOIN order_details d ON d.sale=s.id WHERE d.sale IS NULL OR d.status IN ('delivered','completed')").fetchone())
+  report.update(dict(c.execute("SELECT COUNT(*) AS pending_orders,COALESCE(SUM(s.total),0) AS pending_total FROM sales s JOIN order_details d ON d.sale=s.id WHERE d.channel='online' AND d.status NOT IN ('delivered','completed')").fetchone()))
+  accounts=[dict(r) for r in c.execute('SELECT name,role,company FROM users ORDER BY role,name')] if user['role']=='admin' else []
+  return jsonify(user=user,accounts=accounts,sales=[dict(r) for r in c.execute('SELECT * FROM sales ORDER BY id DESC')],orders=[dict(r) for r in c.execute('SELECT * FROM order_details ORDER BY sale DESC')],audit=[dict(r) for r in c.execute('SELECT * FROM audit ORDER BY id DESC LIMIT 100')] if user['role']=='admin' else [],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions ORDER BY id DESC')],report=report)
 
 @web.post('/api/<kind>')
 def action(kind):
@@ -134,7 +135,7 @@ def action(kind):
    response=jsonify(ok=True);response.delete_cookie(domain.COOKIE,path='/');return response
   result=domain.operation(user,kind,d)
   if kind=='manage_user':
-   with domain.connect() as c: c.execute('DELETE FROM web_sessions WHERE username=?',(d['name'].strip(),))
+   with domain.connect() as c: c.execute('DELETE FROM web_sessions WHERE username=?',(result['name'],))
   return jsonify(result)
  except (ValueError,KeyError,TypeError,AttributeError,OverflowError,sqlite3.IntegrityError):
   return jsonify(error='Invalid request. Check the supplied fields and available stock.'),400

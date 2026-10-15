@@ -22,10 +22,11 @@ jobs:
         with:
           node-version: '22'
       - run: python -m pip install -r requirements.txt
-      - run: python -m unittest -v test_isolation test_server test_accounts
+      - run: python -m unittest -v test_isolation test_server test_accounts test_workers
       - run: node test_frontend.cjs
       - run: node --check assets/site.js
       - run: node --check assets/staff.js
       - run: node --check assets/i18n.js
       - run: node --check assets/customer.js
       - run: node --check assets/recovery.js
+      - run: node --check assets/workers.js
