@@ -2,6 +2,7 @@
 !requirements.txt
 !app.py
 !server.py
+!accounts.py
 !shop.json
 !index.html
 !staff.html
