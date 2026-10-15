@@ -38,3 +38,5 @@ node --check assets/recovery.js
 ```
 
 Tests use disposable databases and synthetic credentials. Do not upload local test databases to production.
+
+Account settings: registration returns to shopping. The Account button opens Overview, Personal details, Orders and Password settings. Signed-in customers can update their own name, phone and address. Email is displayed but cannot be changed. Password settings require the current password and confirmation of the new password; email-based recovery remains deferred.

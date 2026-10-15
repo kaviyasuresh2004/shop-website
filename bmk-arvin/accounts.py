@@ -57,6 +57,12 @@ def install(server):
      return session(c,row['id'])
    customer=current()
    if not customer: return jsonify(error='Customer sign in required'),401
+   if kind=='profile':
+    name=d['name'].strip();phone=d.get('phone','').strip();address=d.get('address','').strip()
+    if not name or len(name)>200 or len(phone)>80 or len(address)>1000:raise ValueError()
+    with domain.connect() as c:
+     c.execute('UPDATE customers SET name=?,phone=?,address=? WHERE id=?',(name,phone,address,customer['id']))
+    return jsonify(ok=True)
    if kind=='logout':
     with domain.connect() as c: c.execute('DELETE FROM customer_sessions WHERE token=?',(hashlib.sha256(request.cookies.get(cookie,'').encode()).hexdigest(),))
     response=jsonify(ok=True); response.delete_cookie(cookie,path='/'); return response
