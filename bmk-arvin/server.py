@@ -108,7 +108,7 @@ def action(kind):
       expected=os.environ.get('SETUP_TOKEN','')
       if not expected or not hmac.compare_digest(str(d.get('setup_token','')),expected): return jsonify(error='Setup token required'),403
      if c.execute('SELECT 1 FROM users').fetchone(): raise ValueError('Setup already completed')
-     if not name or len(name)>100 or len(password)<12: raise ValueError('Use a username and password of at least 12 characters')
+     if not name or len(name)>100 or len(password)<8: raise ValueError('Use a username and password of at least 8 characters')
      salt=secrets.token_hex(16);c.execute('INSERT INTO users VALUES (?,?,?,?,1)',(name,salt,domain.password_hash(password,salt),'admin'));domain.audit(c,name,'admin setup',{})
     rows=c.execute('SELECT * FROM users WHERE lower(name)=lower(?)',(name,)).fetchall()
     row=rows[0] if len(rows)==1 else None

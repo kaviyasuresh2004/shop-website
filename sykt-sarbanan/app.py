@@ -158,7 +158,7 @@ def operation(user,kind,d,*,customer_id=None):
   elif kind=='user':
    if user['role']!='admin': raise ValueError('Only admin can create workers')
    name=d['name'].strip(); p=d['password']
-   if not name or len(name)>100 or not 12<=len(p)<=256: raise ValueError('Username and password of at least 12 characters required')
+   if not name or len(name)>100 or not 8<=len(p)<=256: raise ValueError('Username and password of at least 8 characters required')
    if c.execute('SELECT 1 FROM users WHERE lower(name)=lower(?)',(name,)).fetchone(): raise ValueError('Username already exists')
    salt=secrets.token_hex(16); c.execute('INSERT INTO users VALUES (?,?,?,?,?)',(name,salt,password_hash(p,salt),'worker',company)); audit(c,user['name'],'worker created',{'name':name,'company':company}); return {'ok':True,'name':name,'role':'worker','company':company}
   elif kind=='manage_user':
@@ -169,7 +169,7 @@ def operation(user,kind,d,*,customer_id=None):
    name=accounts[0]['name']
    if name==user['name']: raise ValueError('Cannot remove your own account')
    if d.get('password'):
-    if not 12<=len(d['password'])<=256: raise ValueError('Password must be at least 12 characters')
+    if not 8<=len(d['password'])<=256: raise ValueError('Password must be at least 8 characters')
     salt=secrets.token_hex(16)
     if c.execute('UPDATE users SET salt=?,password=? WHERE name=?',(salt,password_hash(d['password'],salt),name)).rowcount!=1: raise ValueError('Unknown account')
    else:
@@ -214,7 +214,7 @@ class Handler(BaseHTTPRequestHandler):
      if kind=='setup':
       if c.execute('SELECT 1 FROM users').fetchone(): raise ValueError('Setup already completed')
       p=d['password']; name=d['name'].strip(); d['name']=name
-      if not name or len(p)<12: raise ValueError('Use a username and password of at least 12 characters')
+      if not name or len(p)<8: raise ValueError('Use a username and password of at least 8 characters')
       if c.execute('SELECT 1 FROM users WHERE lower(name)=lower(?)',(name,)).fetchone(): raise ValueError('Username already exists')
       salt=secrets.token_hex(16); c.execute('INSERT INTO users VALUES (?,?,?,?,?)',(name,salt,password_hash(p,salt),'admin',1)); audit(c,name,'admin setup',{})
      row=c.execute('SELECT * FROM users WHERE name=?',(d['name'],)).fetchone()

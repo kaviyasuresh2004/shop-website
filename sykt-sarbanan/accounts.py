@@ -49,7 +49,7 @@ def install(server):
     with domain.LOCK, domain.connect() as c:
      if kind=='register':
       name=d['name'].strip(); phone=d.get('phone','').strip(); address=d.get('address','').strip()
-      if not name or len(name)>200 or len(phone)>80 or len(address)>1000 or len(password)<12: raise ValueError()
+      if not name or len(name)>200 or len(phone)>80 or len(address)>1000 or len(password)<8: raise ValueError()
       salt=secrets.token_hex(16)
       c.execute('INSERT INTO customers(email,name,phone,address,salt,password) VALUES (?,?,?,?,?,?)',(email,name,phone,address,salt,domain.password_hash(password,salt)))
      row=c.execute('SELECT * FROM customers WHERE email=?',(email,)).fetchone()
@@ -62,7 +62,7 @@ def install(server):
     response=jsonify(ok=True); response.delete_cookie(cookie,path='/'); return response
    if kind=='password':
     old=d['current_password']; new=d['password']
-    if not isinstance(old,str) or not isinstance(new,str) or not 12<=len(new)<=256: raise ValueError()
+    if not isinstance(old,str) or not isinstance(new,str) or not 8<=len(new)<=256: raise ValueError()
     if not hmac.compare_digest(customer['password'],domain.password_hash(old,customer['salt'])): return jsonify(error='Invalid credentials'),401
     with domain.LOCK,domain.connect() as c:
      salt=secrets.token_hex(16)
@@ -83,7 +83,7 @@ def install(server):
   if len(expected)<32 or not isinstance(supplied,str) or not hmac.compare_digest(supplied.encode(),expected.encode()): return jsonify(error='Recovery token required'),403
   try:
    name=d['name'].strip(); password=d['password']
-   if not isinstance(password,str) or not 12<=len(password)<=256: raise ValueError()
+   if not isinstance(password,str) or not 8<=len(password)<=256: raise ValueError()
    with domain.LOCK,domain.connect() as c:
     c.execute('BEGIN IMMEDIATE')
     digest=hashlib.sha256(expected.encode()).hexdigest()
