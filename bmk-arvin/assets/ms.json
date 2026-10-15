@@ -47,7 +47,7 @@
   "yourLocalPartners": "RAKAN PERKAKASAN TEMPATAN ANDA",
   "twoShopsTitle": "Perkakasan untuk projek anda",
   "shopsIntro": "Katalog, stok dan perkhidmatan kami.",
-  "photoPending": "Gambar kedai yang disahkan akan ditambah",
+  "photoPending": "Gambar produk akan ditambah",
   "shopInfoPending": "Alamat, telefon dan waktu operasi menunggu maklumat yang disahkan.",
   "mapPending": "Pautan peta selepas pengesahan alamat",
   "fromOurShopsToYourDoor": "DARI KEDAI KAMI KE PINTU ANDA",
@@ -348,5 +348,16 @@
   "paymentPaid": "Tunai diterima",
   "paymentPending": "Bayaran tunai belum diterima",
   "paymentUnrecorded": "Bayaran belum direkod",
-  "cashCollectedHelp": "Tandakan tunai diterima hanya selepas pelanggan membayar. Status penghantaran sahaja tidak menandakan bayaran diterima."
+  "cashCollectedHelp": "Tandakan tunai diterima hanya selepas pelanggan membayar. Status penghantaran sahaja tidak menandakan bayaran diterima.",
+  "colSourceQuantity": "Kuantiti Tally",
+  "colUnit": "Unit",
+  "catalogueImportTitle": "Import katalog Tally",
+  "catalogueImportHelp": "Muat naik fail katalog yang disediakan. Semua produk masuk inventori kakitangan; hanya stok tersedia dengan harga dipaparkan di kedai. Kuantiti asal Tally disimpan sebagai rujukan. Fail sama tidak akan menulis ganti perubahan stok kemudian.",
+  "catalogueImportButton": "Import katalog",
+  "catalogueImportReady": "{count} produk · {location}",
+  "catalogueImportInvalid": "Sila pilih fail JSON katalog yang disediakan.",
+  "catalogueImportDone": "{count} produk diimport. Kedai: {visible} dipaparkan, {hidden} disembunyikan.",
+  "inventorySearch": "Cari inventori mengikut nama atau SKU",
+  "inventorySearchHelp": "Memaparkan sehingga 100 padanan. Cari untuk menapis inventori dan pilihan produk, kemudian kemas kini kuantiti atau harga. Produk tanpa stok atau harga disembunyikan dari kedai.",
+  "showMore": "Paparkan lebih banyak produk"
 }

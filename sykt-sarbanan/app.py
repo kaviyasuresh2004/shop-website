@@ -1,5 +1,6 @@
 import mimetypes
 import commerce
+import inventory
 from datetime import datetime, timezone
 from urllib.parse import urlsplit, unquote
 import csv, hashlib, hmac, io, json, os, secrets, sqlite3, threading
@@ -42,6 +43,7 @@ def init():
    c.executemany('INSERT INTO stock VALUES (?,?,?)',[(company,p,30 if company==1 else 20) for company in (1,) for p in range(1,7)])
    audit(c,'system','setup','Sample catalogue and stock created; replace before real use')
   commerce.initialize(c)
+  inventory.initialize(c)
   companies=c.execute('SELECT id,name FROM companies').fetchall()
   if len(companies)!=1 or companies[0]['id']!=1 or companies[0]['name']!=CONFIG['name']: raise ValueError('Database identity mismatch: use only this shop database')
 def audit(c,actor,action,detail): c.execute('INSERT INTO audit(actor,action,detail) VALUES (?,?,?)',(actor,action,json.dumps(detail)))
@@ -74,6 +76,7 @@ def operation(user,kind,d,*,customer_id=None):
    product=integer(d['product']); delta=integer(d['delta']); reason=d.get('reason','').strip()
    if not reason: raise ValueError('Adjustment reason required')
    if c.execute('UPDATE stock SET qty=qty+? WHERE company=? AND id=? AND qty+?>=0',(delta,company,product,delta)).rowcount!=1: raise ValueError('Invalid product or insufficient stock')
+   c.execute('UPDATE inventory_source SET hold=0 WHERE product=?',(product,))
    audit(c,user['name'],'stock adjustment',d)
   elif kind in ('sale','order'):
    request_key=d.get('request_id','') if kind=='order' else ''
@@ -98,6 +101,7 @@ def operation(user,kind,d,*,customer_id=None):
    for p,q in combined.items():
     row=c.execute('SELECT * FROM products WHERE id=?',(p,)).fetchone()
     if not row: raise ValueError('Unknown product')
+    if kind=='order' and not inventory.available(c,p): raise ValueError('Product unavailable')
     if c.execute('UPDATE stock SET qty=qty-? WHERE company=? AND id=? AND qty>=?',(q,company,p,q)).rowcount!=1: raise ValueError('Insufficient stock')
     unit_price=effective_price(c,row,company); total+=unit_price*q; lines.append({'product':p,'sku':row['sku'],'qty':q,'unit_price':unit_price})
    sale=c.execute('INSERT INTO sales(company,customer,items,total,delivery) VALUES (?,?,?,?,?)',(company,customer,json.dumps(lines),total,fees[zone])).lastrowid

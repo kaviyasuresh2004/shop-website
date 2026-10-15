@@ -6,7 +6,7 @@ from flask import Flask,request,jsonify,send_from_directory
 import app as domain
 
 web=Flask(__name__,static_folder=None)
-web.config['MAX_CONTENT_LENGTH']=1_000_000
+web.config['MAX_CONTENT_LENGTH']=8_000_000
 PRODUCTION=os.environ.get('APP_ENV')=='production'
 PREVIEW=os.environ.get('SHOP_MODE','preview')!='live'
 PUBLIC_URL=os.environ.get('PUBLIC_URL','').rstrip('/')
@@ -80,8 +80,10 @@ def health():
 
 @web.get('/api/catalog')
 def catalog():
+ user=signed_in() if request.args.get('staff')=='1' else None
  with domain.connect() as c:
-  return jsonify(companies=[dict(r) for r in c.execute('SELECT * FROM companies')],products=[dict(r) for r in c.execute('SELECT * FROM products')],stock=[dict(r) for r in c.execute('SELECT * FROM stock')],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions WHERE active=1') if domain.promotion_valid(r)],setup=not bool(c.execute('SELECT 1 FROM users').fetchone()),setupProtected=PRODUCTION,preview=not domain.commerce.load(c,not PREVIEW)['checkout_enabled'],shopDetails=domain.commerce.load(c,not PREVIEW))
+  ids={r['id'] for r in c.execute('SELECT id FROM products') if user or domain.inventory.available(c,r['id'])}
+  return jsonify(companies=[dict(r) for r in c.execute('SELECT * FROM companies')],products=[dict(r) for r in c.execute('SELECT * FROM products') if r['id'] in ids],stock=[dict(r) for r in c.execute('SELECT * FROM stock') if r['id'] in ids],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions WHERE active=1') if domain.promotion_valid(r)],setup=not bool(c.execute('SELECT 1 FROM users').fetchone()),setupProtected=PRODUCTION,preview=not domain.commerce.load(c,not PREVIEW)['checkout_enabled'],shopDetails=domain.commerce.load(c,not PREVIEW))
 
 @web.get('/api/staff')
 def staff():
@@ -91,7 +93,7 @@ def staff():
   report=dict(c.execute("SELECT COUNT(*) AS sales,COALESCE(SUM(s.total),0) AS total FROM sales s LEFT JOIN order_details d ON d.sale=s.id WHERE d.sale IS NULL OR d.status IN ('delivered','completed')").fetchone())
   report.update(dict(c.execute("SELECT COUNT(*) AS pending_orders,COALESCE(SUM(s.total),0) AS pending_total FROM sales s JOIN order_details d ON d.sale=s.id WHERE d.channel='online' AND d.status NOT IN ('delivered','completed')").fetchone()))
   accounts=[dict(r) for r in c.execute('SELECT name,role,company FROM users ORDER BY role,name')] if user['role']=='admin' else []
-  return jsonify(user=user,accounts=accounts,sales=[dict(r) for r in c.execute('SELECT * FROM sales ORDER BY id DESC')],orders=[dict(r) for r in c.execute("SELECT d.*,COALESCE(p.method,'manual') AS payment_method,COALESCE(p.status,'unrecorded') AS payment_status FROM order_details d LEFT JOIN order_payments p ON p.sale=d.sale ORDER BY d.sale DESC")],audit=[dict(r) for r in c.execute('SELECT * FROM audit ORDER BY id DESC LIMIT 100')] if user['role']=='admin' else [],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions ORDER BY id DESC')],report=report)
+  return jsonify(inventory_source=[dict(r) for r in c.execute('SELECT * FROM inventory_source')],user=user,accounts=accounts,sales=[dict(r) for r in c.execute('SELECT * FROM sales ORDER BY id DESC')],orders=[dict(r) for r in c.execute("SELECT d.*,COALESCE(p.method,'manual') AS payment_method,COALESCE(p.status,'unrecorded') AS payment_status FROM order_details d LEFT JOIN order_payments p ON p.sale=d.sale ORDER BY d.sale DESC")],audit=[dict(r) for r in c.execute('SELECT * FROM audit ORDER BY id DESC LIMIT 100')] if user['role']=='admin' else [],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions ORDER BY id DESC')],report=report)
 
 @web.post('/api/<kind>')
 def action(kind):
@@ -131,6 +133,9 @@ def action(kind):
    return jsonify(domain.operation({'name':customer['email'],'role':'customer','company':1},kind,d,customer_id=customer['id']))
   user=signed_in()
   if not user: return jsonify(error='Sign in required'),401
+  if kind=='catalogue-import':
+   if user['role']!='admin':return jsonify(error='Administrator access required'),403
+   return jsonify(domain.inventory.import_catalogue(domain,user,d))
   if kind=='shop-settings':
    if user['role']!='admin':return jsonify(error='Administrator access required'),403
    with domain.LOCK,domain.connect() as c:

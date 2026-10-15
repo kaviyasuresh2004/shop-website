@@ -47,7 +47,7 @@
   "yourLocalPartners": "YOUR LOCAL HARDWARE PARTNERS",
   "twoShopsTitle": "Hardware for your next project",
   "shopsIntro": "Our own catalogue, stock and service.",
-  "photoPending": "Verified shop photograph to be added",
+  "photoPending": "Product photo to be added",
   "shopInfoPending": "Address, telephone and opening hours awaiting verified details.",
   "mapPending": "Map link available after address confirmation",
   "fromOurShopsToYourDoor": "FROM OUR SHOPS TO YOUR DOOR",
@@ -378,5 +378,16 @@
   "paymentPaid": "Cash collected",
   "paymentPending": "Cash payment due",
   "paymentUnrecorded": "Payment not recorded",
-  "cashCollectedHelp": "Mark cash collected only after the customer has paid. Delivery status alone does not mark payment as received."
+  "cashCollectedHelp": "Mark cash collected only after the customer has paid. Delivery status alone does not mark payment as received.",
+  "colSourceQuantity": "Tally quantity",
+  "colUnit": "Unit",
+  "catalogueImportTitle": "Import Tally catalogue",
+  "catalogueImportHelp": "Upload the prepared catalogue file. All products enter staff inventory; only priced, available stock appears in the shop. Original Tally quantities remain for reference. Re-uploading the identical file will not overwrite later stock changes.",
+  "catalogueImportButton": "Import catalogue",
+  "catalogueImportReady": "{count} products · {location}",
+  "catalogueImportInvalid": "Please choose the prepared catalogue JSON file.",
+  "catalogueImportDone": "Imported {count} products. Shop: {visible} visible, {hidden} hidden.",
+  "inventorySearch": "Find inventory by name or SKU",
+  "inventorySearchHelp": "Showing up to 100 matches. Search here to filter inventory and product selectors, then update the quantity or price. Products with zero stock or no price remain hidden from the shop.",
+  "showMore": "Show more products"
 }
