@@ -419,5 +419,12 @@
   "whatsappCustomer": "Buka draf WhatsApp",
   "orderWhatsappDraft": "Salam {name}, kami dari {shop} berkenaan pesanan #{id}, jumlah {total}. Sila sahkan bahawa anda ingin meneruskan pesanan dan sahkan urusan penghantaran atau pengambilan. Terima kasih.",
   "manualOrderHelp": "Hubungi pelanggan melalui telefon atau WhatsApp untuk mengesahkan pesanan. WhatsApp membuka draf; semak dan hantarnya sendiri. Tukar status kepada processing selepas pengesahan. Membuka pautan tidak mengesahkan pesanan atau bayaran.",
-  "manualConfirmationCustomer": "Kakitangan kami akan menghubungi anda melalui telefon atau WhatsApp untuk mengesahkan pesanan dan urusan penghantaran atau pengambilan."
+  "manualConfirmationCustomer": "Kakitangan kami akan menghubungi anda melalui telefon atau WhatsApp untuk mengesahkan pesanan dan urusan penghantaran atau pengambilan.",
+  "productPhoto": "Foto produk",
+  "photoHelp": "Cari produk melalui carian inventori di atas, pilih produk di sini dan muat naik foto. Hanya pekerja dan pentadbir boleh mengubah foto. JPEG, PNG atau WebP sehingga 5 MB dan 12 megapiksel.",
+  "choosePhoto": "Pilih foto",
+  "uploadPhoto": "Muat naik / ganti foto",
+  "photoSaved": "Foto disimpan. Pelanggan kini boleh melihatnya.",
+  "photoInvalid": "Pilih foto JPEG, PNG atau WebP sehingga 5 MB dan 12 megapiksel.",
+  "photoFailed": "Foto tidak dapat disimpan. Semak fail dan cuba lagi."
 }

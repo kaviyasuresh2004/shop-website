@@ -4,6 +4,8 @@ from collections import defaultdict,deque
 from urllib.parse import urlsplit
 from flask import Flask,request,jsonify,send_from_directory
 import app as domain
+import photos
+from flask import Response
 
 web=Flask(__name__,static_folder=None)
 web.config['MAX_CONTENT_LENGTH']=8_000_000
@@ -20,6 +22,7 @@ def initialize():
  domain.init()
  initialize_accounts()
  with domain.connect() as c:
+  photos.initialize(c)
   c.execute('CREATE TABLE IF NOT EXISTS web_sessions(token TEXT PRIMARY KEY,username TEXT REFERENCES users(name) ON DELETE CASCADE,expires INTEGER)')
 
 def public_origin():
@@ -82,8 +85,9 @@ def health():
 def catalog():
  user=signed_in() if request.args.get('staff')=='1' else None
  with domain.connect() as c:
+  photo_urls=photos.urls(c)
   ids={r['id'] for r in c.execute('SELECT id FROM products') if user or domain.inventory.available(c,r['id'])}
-  return jsonify(companies=[dict(r) for r in c.execute('SELECT * FROM companies')],products=[dict(r) for r in c.execute('SELECT * FROM products') if r['id'] in ids],stock=[dict(r) for r in c.execute('SELECT * FROM stock') if r['id'] in ids],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions WHERE active=1') if domain.promotion_valid(r)],setup=not bool(c.execute('SELECT 1 FROM users').fetchone()),setupProtected=PRODUCTION,preview=not domain.commerce.load(c,not PREVIEW)['checkout_enabled'],shopDetails=domain.commerce.load(c,not PREVIEW))
+  return jsonify(companies=[dict(r) for r in c.execute('SELECT * FROM companies')],products=[dict(r,photo_url=photo_urls.get(r['id'],'')) for r in c.execute('SELECT * FROM products') if r['id'] in ids],stock=[dict(r) for r in c.execute('SELECT * FROM stock') if r['id'] in ids],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions WHERE active=1') if domain.promotion_valid(r)],setup=not bool(c.execute('SELECT 1 FROM users').fetchone()),setupProtected=PRODUCTION,preview=not domain.commerce.load(c,not PREVIEW)['checkout_enabled'],shopDetails=domain.commerce.load(c,not PREVIEW))
 
 @web.get('/api/staff')
 def staff():
@@ -135,6 +139,8 @@ def action(kind):
    return jsonify(domain.operation({'name':customer['email'],'role':'customer','company':1},kind,d,customer_id=customer['id']))
   user=signed_in()
   if not user: return jsonify(error='Sign in required'),401
+  if kind=='product-photo':
+   return jsonify(photos.save(domain,user,d))
   if kind=='catalogue-import':
    if user['role']!='admin':return jsonify(error='Administrator access required'),403
    return jsonify(domain.inventory.import_catalogue(domain,user,d))
@@ -170,5 +176,15 @@ import accounts
 initialize_accounts,current_customer=accounts.install(__import__(__name__))
 domain.shopping.install(__import__(__name__))
 domain.phone_verification.install(__import__(__name__))
+
+
+@web.get('/product-photos/<int:product>/<digest>.jpg')
+def product_photo(product,digest):
+ with domain.connect() as c:
+  row=c.execute('SELECT p.image FROM product_photos p JOIN products i ON i.id=p.product WHERE p.product=? AND p.digest=?',(product,digest)).fetchone()
+ if not row:return '',404
+ response=Response(bytes(row['image']),mimetype='image/jpeg')
+ response.headers['Cache-Control']='public,max-age=31536000,immutable'
+ return response
 
 if __name__=='__main__': serve()

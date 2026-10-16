@@ -1,0 +1,7 @@
+document.addEventListener('DOMContentLoaded',()=>{
+ const form=document.getElementById('productPhotoForm'),file=document.getElementById('photoFile'),select=document.getElementById('photoProduct'),preview=document.getElementById('photoPreview'),result=document.getElementById('photoResult');
+ let previewUrl;
+ function updatePreview(){if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null;}const product=data?.products.find(p=>String(p.id)===select.value);const photo=file.files[0];if(photo){previewUrl=URL.createObjectURL(photo);preview.src=previewUrl;}else preview.src=product?.photo_url||'';preview.hidden=!preview.getAttribute('src');}
+ file.addEventListener('change',updatePreview);select.addEventListener('change',()=>{file.value='';updatePreview();result.textContent='';});
+ form.addEventListener('submit',async event=>{event.preventDefault();const photo=file.files[0];if(!photo||photo.size>5000000||!['image/jpeg','image/png','image/webp'].includes(photo.type)){result.textContent=t('photoInvalid');return;}const button=form.querySelector('button');button.disabled=true;result.textContent='';try{const encoded=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result.split(',')[1]);reader.onerror=reject;reader.readAsDataURL(photo);});await api('product-photo',{product:select.value,image:encoded});await load();file.value='';updatePreview();result.textContent=t('photoSaved');}catch{result.textContent=t('photoFailed');}finally{button.disabled=false;}});
+});
