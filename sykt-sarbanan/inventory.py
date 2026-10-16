@@ -10,6 +10,7 @@ def available(c,pid):
 
 def import_catalogue(domain,user,d):
  if user['role']!='admin':raise ValueError('Administrator required')
+ if d.get('source_company')!='SYKT PG. SARBANUN SDN BHD':raise ValueError('Wrong source company')
  if d.get('shop')!=domain.CONFIG['slug'] or d.get('location')!='Main Location':raise ValueError('Wrong shop or location')
  rows=d.get('items');digest=d.get('source_sha256','')
  if not isinstance(rows,list) or not 1<=len(rows)<=20000 or len(digest)!=64:raise ValueError('Invalid import')
@@ -26,7 +27,7 @@ def import_catalogue(domain,user,d):
   seen=set();visible=0
   for row in rows:
    name=row['name'];sku=row['sku'];source=row['source_name'];price=domain.integer(row['price_cents']);qty=domain.integer(row['quantity']);hold=row['hold'];raw=row['source_quantity'];unit=row['unit']
-   expected='BMK-TALLY-'+hashlib.sha256(source.encode()).hexdigest()[:16].upper()
+   expected='SYKT-TALLY-'+hashlib.sha256(source.encode()).hexdigest()[:16].upper()
    if sku!=expected or sku in seen or not 1<=len(name)<=200 or len(source)>2000 or not 0<=price<=100000000 or not 0<=qty<=1000000000 or type(hold)!=bool or not isinstance(raw,str) or len(raw)>100 or not isinstance(unit,str) or len(unit)>80:raise ValueError('Invalid product row')
    seen.add(sku)
    c.execute("INSERT INTO products(sku,name,category,price) VALUES (?,?,'Uncategorised',?) ON CONFLICT(sku) DO UPDATE SET name=excluded.name,price=excluded.price",(sku,name,price))
