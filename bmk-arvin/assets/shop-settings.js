@@ -8,7 +8,7 @@ window.renderShopSettings=function(currentStaff,catalog){
 window.applyShopDetails=function(catalog){
  const details=catalog.shopDetails;
  if(!details)return;
- let legal=document.getElementById('registeredCompanyInfo');if(!legal){legal=document.createElement('p');legal.id='registeredCompanyInfo';document.querySelector('.shop-info')?.append(legal);}legal.textContent=[details.legal_name,details.registered_address?I18n.t('registeredAddress')+': '+details.registered_address:'',details.incorporation_date?I18n.t('incorporationDate')+': '+details.incorporation_date:''].filter(Boolean).join(' · ');
+ let legal=document.getElementById('registeredCompanyInfo');if(!legal){legal=document.createElement('p');legal.id='registeredCompanyInfo';document.querySelector('.shop-info')?.append(legal);}legal.textContent=[details.legal_name,details.registered_address?I18n.t('registeredAddress')+': '+details.registered_address:'',details.incorporation_date?I18n.t('incorporationDate')+': '+details.incorporation_date:''].filter(Boolean).join(' | ');
  const info=document.querySelector('[data-t="shopInfoPending"]');
  if(info&&details.address)info.textContent=[details.address,details.phone,details.hours].filter(Boolean).join(' Â· ');
  const map=document.querySelector('.shop-info .pending');
