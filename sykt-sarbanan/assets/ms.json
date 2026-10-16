@@ -432,5 +432,16 @@
   "photoCover": "Foto utama",
   "makeCover": "Jadikan foto utama",
   "removePhoto": "Buang foto",
-  "confirmRemovePhoto": "Buang foto produk ini? Anda boleh memuat naik semula fail asal."
+  "confirmRemovePhoto": "Buang foto produk ini? Anda boleh memuat naik semula fail asal.",
+  "legalName": "Nama syarikat berdaftar",
+  "registeredAddress": "Alamat pejabat berdaftar",
+  "incorporationDate": "Tarikh penubuhan",
+  "categoryManager": "Kategori produk",
+  "categoryManagerHelp": "Cari inventori di atas, pilih produk dan simpan kategori. Stok dan harga tidak berubah.",
+  "saveCategory": "Simpan kategori",
+  "autoCategoryHelp": "Pentadbir: pratonton kategori berdasarkan nama bagi produk tanpa kategori. Kategori sedia ada dikekalkan. Produk tidak jelas perlu disemak.",
+  "previewCategories": "Pratonton kumpulan kategori",
+  "applyCategories": "Gunakan kumpulan kategori ini",
+  "categoryPreviewSummary": "{count} produk boleh dikumpulkan; {remaining} perlu semakan manual.",
+  "categoryApplied": "{count} produk dikumpulkan. Produk tidak jelas masih memerlukan semakan manual."
 }

@@ -5,6 +5,7 @@ from urllib.parse import urlsplit
 from flask import Flask,request,jsonify,send_from_directory
 import app as domain
 import photos
+import categorisation
 from flask import Response
 
 web=Flask(__name__,static_folder=None)
@@ -87,7 +88,7 @@ def catalog():
  with domain.connect() as c:
   photo_urls=photos.urls(c)
   ids={r['id'] for r in c.execute('SELECT id FROM products') if user or domain.inventory.available(c,r['id'])}
-  return jsonify(companies=[dict(r) for r in c.execute('SELECT * FROM companies')],products=[dict(r,photo_url=next(iter(photo_urls.get(r['id'],[])),''),photo_urls=photo_urls.get(r['id'],[])) for r in c.execute('SELECT * FROM products') if r['id'] in ids],stock=[dict(r) for r in c.execute('SELECT * FROM stock') if r['id'] in ids],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions WHERE active=1') if domain.promotion_valid(r)],setup=not bool(c.execute('SELECT 1 FROM users').fetchone()),setupProtected=PRODUCTION,preview=not domain.commerce.load(c,not PREVIEW)['checkout_enabled'],shopDetails=domain.commerce.load(c,not PREVIEW))
+  return jsonify(shop_slug=domain.CONFIG['slug'],companies=[dict(r) for r in c.execute('SELECT * FROM companies')],products=[dict(r,photo_url=next(iter(photo_urls.get(r['id'],[])),''),photo_urls=photo_urls.get(r['id'],[])) for r in c.execute('SELECT * FROM products') if r['id'] in ids],stock=[dict(r) for r in c.execute('SELECT * FROM stock') if r['id'] in ids],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions WHERE active=1') if domain.promotion_valid(r)],setup=not bool(c.execute('SELECT 1 FROM users').fetchone()),setupProtected=PRODUCTION,preview=not domain.commerce.load(c,not PREVIEW)['checkout_enabled'],shopDetails=domain.commerce.load(c,not PREVIEW))
 
 @web.get('/api/staff')
 def staff():
@@ -139,6 +140,16 @@ def action(kind):
    return jsonify(domain.operation({'name':customer['email'],'role':'customer','company':1},kind,d,customer_id=customer['id']))
   user=signed_in()
   if not user: return jsonify(error='Sign in required'),401
+  if kind=='categorise':
+   if user['role']!='admin':return jsonify(error='Administrator access required'),403
+   return jsonify(categorisation.run(domain,user,d))
+  if kind=='product-category':
+   category=d['category']
+   if category not in categorisation.CATEGORIES:raise ValueError('Invalid category')
+   with domain.LOCK,domain.connect() as c:
+    if c.execute('UPDATE products SET category=? WHERE id=?',(category,domain.integer(d['product']))).rowcount!=1:raise ValueError('Unknown product')
+    domain.audit(c,user['name'],'product category updated',{'product':d['product'],'category':category})
+   return jsonify(ok=True)
   if kind=='product-photo':
    return jsonify(photos.save(domain,user,d))
   if kind=='catalogue-import':

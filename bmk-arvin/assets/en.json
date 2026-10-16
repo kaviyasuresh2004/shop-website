@@ -462,5 +462,16 @@
   "photoCover": "Cover photo",
   "makeCover": "Make cover",
   "removePhoto": "Remove photo",
-  "confirmRemovePhoto": "Remove this product photo? You can upload it again from your original file."
+  "confirmRemovePhoto": "Remove this product photo? You can upload it again from your original file.",
+  "legalName": "Registered company name",
+  "registeredAddress": "Registered office address",
+  "incorporationDate": "Incorporation date",
+  "categoryManager": "Product categories",
+  "categoryManagerHelp": "Search inventory above, then select a product and save its category. This changes only the category, keeping stock and prices unchanged.",
+  "saveCategory": "Save category",
+  "autoCategoryHelp": "Administrator: preview name-based categories for uncategorised products. Existing categories are preserved. Unclear items stay uncategorised for review.",
+  "previewCategories": "Preview category groups",
+  "applyCategories": "Apply these category groups",
+  "categoryPreviewSummary": "{count} products can be grouped; {remaining} need manual review.",
+  "categoryApplied": "Grouped {count} products. Remaining unclear items need manual review."
 }

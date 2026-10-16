@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: '22'
       - run: python -m pip install -r requirements.txt
-      - run: python -m unittest -v test_isolation test_server test_accounts test_workers test_password_policy test_profile test_commerce test_inventory test_shopping test_photos
+      - run: python -m unittest -v test_isolation test_server test_accounts test_workers test_password_policy test_profile test_commerce test_inventory test_shopping test_photos test_categories
       - run: node test_frontend.cjs
       - run: node test_account_ui.cjs
       - run: node test_manual_contact.cjs
@@ -36,3 +36,4 @@ jobs:
       - run: node --check assets/inventory.js
       - run: node --check assets/photos.js
       - run: node test_photo_ui.cjs
+      - run: node --check assets/categories.js

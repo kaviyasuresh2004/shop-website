@@ -2,7 +2,7 @@
 import json
 from urllib.parse import urlsplit
 
-DEFAULTS={'address':'','phone':'','hours':'','map_url':'','delivery_policy':'','returns_policy':'','privacy_policy':'','checkout_enabled':False,'catalogue_confirmed':False,'delivery_fees':{'pickup':0,'Brunei-Muara':500,'Tutong':1000,'Belait':1500,'Temburong':2000}}
+DEFAULTS={'legal_name':'','registered_address':'','incorporation_date':'','address':'','phone':'','hours':'','map_url':'','delivery_policy':'','returns_policy':'','privacy_policy':'','checkout_enabled':False,'catalogue_confirmed':False,'delivery_fees':{'pickup':0,'Brunei-Muara':500,'Tutong':1000,'Belait':1500,'Temburong':2000}}
 
 def initialize(c):
  c.executescript('''CREATE TABLE IF NOT EXISTS shop_settings(id INTEGER PRIMARY KEY CHECK(id=1),data TEXT NOT NULL);
@@ -16,8 +16,9 @@ def load(c,default_enabled=False):
 
 def save(c,d):
  result={}
- for key,limit in [('address',1000),('phone',80),('hours',500),('map_url',2000),('delivery_policy',5000),('returns_policy',5000),('privacy_policy',5000)]:
-  value=d.get(key,'')
+ old=load(c)
+ for key,limit in [('legal_name',200),('registered_address',1000),('incorporation_date',40),('address',1000),('phone',80),('hours',500),('map_url',2000),('delivery_policy',5000),('returns_policy',5000),('privacy_policy',5000)]:
+  value=d.get(key,old.get(key,''))
   if not isinstance(value,str) or len(value)>limit:raise ValueError()
   result[key]=value.strip()
  if result['map_url']:
