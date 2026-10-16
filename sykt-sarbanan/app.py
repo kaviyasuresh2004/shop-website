@@ -1,6 +1,8 @@
 import mimetypes
 import commerce
 import inventory
+import shopping
+import phone_verification
 from datetime import datetime, timezone
 from urllib.parse import urlsplit, unquote
 import csv, hashlib, hmac, io, json, os, secrets, sqlite3, threading
@@ -44,6 +46,8 @@ def init():
    audit(c,'system','setup','Sample catalogue and stock created; replace before real use')
   commerce.initialize(c)
   inventory.initialize(c)
+  shopping.initialize(c)
+  phone_verification.initialize(c)
   companies=c.execute('SELECT id,name FROM companies').fetchall()
   if len(companies)!=1 or companies[0]['id']!=1 or companies[0]['name']!=CONFIG['name']: raise ValueError('Database identity mismatch: use only this shop database')
 def audit(c,actor,action,detail): c.execute('INSERT INTO audit(actor,action,detail) VALUES (?,?,?)',(actor,action,json.dumps(detail)))
@@ -104,8 +108,13 @@ def operation(user,kind,d,*,customer_id=None):
     if kind=='order' and not inventory.available(c,p): raise ValueError('Product unavailable')
     if c.execute('UPDATE stock SET qty=qty-? WHERE company=? AND id=? AND qty>=?',(q,company,p,q)).rowcount!=1: raise ValueError('Insufficient stock')
     unit_price=effective_price(c,row,company); total+=unit_price*q; lines.append({'product':p,'sku':row['sku'],'qty':q,'unit_price':unit_price})
+   if kind=='order' and 'reviewed_total' in d and integer(d['reviewed_total'])!=total:raise shopping.ReviewRequired()
    sale=c.execute('INSERT INTO sales(company,customer,items,total,delivery) VALUES (?,?,?,?,?)',(company,customer,json.dumps(lines),total,fees[zone])).lastrowid
    c.execute('INSERT INTO order_details(sale,channel,address,phone,zone,status) VALUES (?,?,?,?,?,?)',(sale,'online' if kind=='order' else 'shop',d.get('address','').strip(),d.get('phone','').strip(),zone,'pending' if kind=='order' else 'completed'))
+   if kind=='order':
+    link=shopping.map_link(d.get('map_url',''));notes=d.get('delivery_notes','')
+    if not isinstance(notes,str) or len(notes)>1000:raise ValueError()
+    c.execute('INSERT INTO delivery_locations VALUES (?,?,?)',(sale,link,notes.strip()))
    if customer_id is not None:
     c.execute('INSERT INTO order_owners VALUES (?,?)',(sale,customer_id))
     if d.get('payment_method','cod')!='cod':raise ValueError('Unsupported payment method')

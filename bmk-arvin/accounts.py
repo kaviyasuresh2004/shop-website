@@ -61,6 +61,8 @@ def install(server):
     name=d['name'].strip();phone=d.get('phone','').strip();address=d.get('address','').strip()
     if not name or len(name)>200 or len(phone)>80 or len(address)>1000:raise ValueError()
     with domain.connect() as c:
+     if phone!=customer['phone']:
+      c.execute('DELETE FROM phone_verified WHERE customer=?',(customer['id'],));c.execute('DELETE FROM phone_challenges WHERE customer=?',(customer['id'],))
      c.execute('UPDATE customers SET name=?,phone=?,address=? WHERE id=?',(name,phone,address,customer['id']))
     return jsonify(ok=True)
    if kind=='logout':

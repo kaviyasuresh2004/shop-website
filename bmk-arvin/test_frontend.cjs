@@ -7,14 +7,14 @@ for(const [htmlName,jsName] of [['index.html','site.js'],['staff.html','staff.js
  const ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(x=>x[1]));
  assert.equal(ids.size,[...html.matchAll(/\bid="([^"]+)"/g)].length,'Duplicate IDs in '+htmlName);
  for(const [,key] of html.matchAll(/data-(?:t|ph|aria)="([^"]+)"/g))assert.ok(en[key]&&ms[key],`${htmlName}: missing ${key}`);
- const dynamic=new Set(['detailSeller','detailAdd','detailPrice','reviewOrder','checkoutForm','checkoutError']);
+ const dynamic=new Set(['detailSeller','detailAdd','detailPrice','reviewOrder','checkoutForm','checkoutError','checkoutMap','backToShopping','checkoutPhone','receiptOrders','bulkEnquiryForm','bulkError']);
  for(const [,id] of js.matchAll(/\$\('([^']+)'\)/g))assert.ok(ids.has(id)||dynamic.has(id),`${jsName}: missing element ${id}`);
  assert.ok(!html.includes('SAR BAN')&&!html.includes('SYKT PG. SARBANUN'));
 }
 const selectors=new Map(),events=[],listeners={},storage=new Map();
 const element=id=>selectors.get(id)||selectors.set(id,{value:'',innerHTML:'',textContent:'',hidden:true,open:false,dataset:{},elements:{customer:{value:''},phone:{value:''},address:{value:''}},classList:{toggle(){}},setAttribute(){},addEventListener(){},querySelectorAll(){return []},showModal(){this.open=true},close(){this.open=false},scrollIntoView(){}}).get(id);
 element('company').value='1';element('sort').value='featured';
-const context={console,setTimeout,clearTimeout,Date,Map,Set,JSON,Object,Number,String,Math,CustomerAccount:{customer:{name:'Test customer'},active:false,open(){element('infoContent').innerHTML='Customer sign in required';},refresh:async()=>{}},FormData:class{constructor(form){this.form=form}*[Symbol.iterator](){for(const [k,v] of Object.entries(this.form.elements))yield [k,v.value]}},CustomEvent:class{constructor(n){this.name=n}},navigator:{language:'ms-BN'},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},document:{documentElement:{},getElementById:element,querySelectorAll:()=>[],addEventListener:(name,fn)=>listeners[name]=fn,dispatchEvent:e=>events.push(e.name)},fetch:async url=>({ok:true,json:async()=>url.includes('/en.')?en:url.includes('/ms.')?ms:{}})};context.window=context;vm.createContext(context);
+const context={console,setTimeout,clearTimeout,setInterval(){},URL,encodeURIComponent,Date,Map,Set,JSON,Object,Number,String,Math,CustomerAccount:{customer:{name:'Test customer'},active:false,open(){element('infoContent').innerHTML='Customer sign in required';},refresh:async()=>{}},FormData:class{constructor(form){this.form=form}*[Symbol.iterator](){for(const [k,v] of Object.entries(this.form.elements))yield [k,v.value]}},CustomEvent:class{constructor(n){this.name=n}},navigator:{language:'ms-BN'},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},document:{documentElement:{},getElementById:element,querySelectorAll:()=>[],addEventListener:(name,fn)=>listeners[name]=fn,dispatchEvent:e=>events.push(e.name)},fetch:async url=>({ok:true,json:async()=>url.includes('/en.')?en:url.includes('/ms.')?ms:{}})};context.window=context;vm.createContext(context);
 vm.runInContext(fs.readFileSync('assets/i18n.js','utf8'),context);
 (async()=>{
  await context.siteReady;assert.equal(vm.runInContext('I18n.language',context),'ms');
@@ -31,5 +31,12 @@ vm.runInContext(fs.readFileSync('assets/i18n.js','utf8'),context);
  assert.equal(element('checkoutForm').elements.customer.value,'Draft customer');assert.equal(element('checkoutForm').elements.phone.value,'123');assert.ok(element('infoContent').innerHTML.includes('checkoutForm'));
  vm.runInContext('CustomerAccount.customer=null;checkout()',context);assert.ok(!element('infoContent').innerHTML.includes('checkoutForm'));assert.ok(element('infoContent').innerHTML.includes('Customer sign in required'));
  const now=Date.now();vm.runInContext(`data.promotions=[{kind:'discount',active:1,company:1,product:1,price:5000,start:new Date(${now}-60000).toISOString(),end:new Date(${now}+60000).toISOString()}]`,context);assert.equal(vm.runInContext('price(data.products[0],1)',context),5000);
+ vm.runInContext("CustomerAccount.customer={name:'Test',phone:'123'};cart=[{product:1,company:1,qty:2}];buyNow(1)",context);
+ assert.equal(vm.runInContext('cart[0].qty',context),2);assert.equal(vm.runInContext('checkoutItems()[0].qty',context),1);assert.ok(element('infoContent').innerHTML.includes('name="buy_quantity"'));assert.ok(element('infoContent').innerHTML.includes('name="map_url"'));
+ const markup=vm.runInContext('priceMarkup(data.products[0],1)',context);assert.ok(markup.includes('<del'));assert.ok(markup.includes('BND 89.00'));assert.ok(markup.includes('BND 50.00'));assert.ok(markup.includes('Offer ends'));
+ vm.runInContext("data.products.push({id:2,name:'Cheap',price:6000,sku:'C',category:'Hand tools'});data.stock.push({id:2,company:1,qty:3});document.getElementById('sort').value='low';render()",context);
+ assert.ok(element('products').innerHTML.indexOf('Drill')<element('products').innerHTML.indexOf('Cheap'),'sort uses discounted price');
+ vm.runInContext("document.getElementById('sort').value='high';render()",context);assert.ok(element('products').innerHTML.indexOf('Cheap')<element('products').innerHTML.indexOf('Drill'));
+ assert.equal(vm.runInContext("isGoogleMap('https://maps.app.goo.gl/test')",context),true);assert.equal(vm.runInContext("isGoogleMap('https://google.com.evil.test/maps')",context),false);
  console.log('PASS: dictionary coverage, static element references, unique IDs, browser-language suggestion, language persistence, independent cart, stock limit, delivery totals, corrupt storage, preview checkout block, active discount.');
 })().catch(e=>{console.error(e);process.exitCode=1});

@@ -93,7 +93,7 @@ def staff():
   report=dict(c.execute("SELECT COUNT(*) AS sales,COALESCE(SUM(s.total),0) AS total FROM sales s LEFT JOIN order_details d ON d.sale=s.id WHERE d.sale IS NULL OR d.status IN ('delivered','completed')").fetchone())
   report.update(dict(c.execute("SELECT COUNT(*) AS pending_orders,COALESCE(SUM(s.total),0) AS pending_total FROM sales s JOIN order_details d ON d.sale=s.id WHERE d.channel='online' AND d.status NOT IN ('delivered','completed')").fetchone()))
   accounts=[dict(r) for r in c.execute('SELECT name,role,company FROM users ORDER BY role,name')] if user['role']=='admin' else []
-  return jsonify(inventory_source=[dict(r) for r in c.execute('SELECT * FROM inventory_source')],user=user,accounts=accounts,sales=[dict(r) for r in c.execute('SELECT * FROM sales ORDER BY id DESC')],orders=[dict(r) for r in c.execute("SELECT d.*,COALESCE(p.method,'manual') AS payment_method,COALESCE(p.status,'unrecorded') AS payment_status FROM order_details d LEFT JOIN order_payments p ON p.sale=d.sale ORDER BY d.sale DESC")],audit=[dict(r) for r in c.execute('SELECT * FROM audit ORDER BY id DESC LIMIT 100')] if user['role']=='admin' else [],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions ORDER BY id DESC')],report=report)
+  return jsonify(enquiries=[dict(r) for r in c.execute('SELECT b.*,c.email FROM bulk_enquiries b JOIN customers c ON c.id=b.customer ORDER BY b.id DESC LIMIT 500')],inventory_source=[dict(r) for r in c.execute('SELECT * FROM inventory_source')],user=user,accounts=accounts,sales=[dict(r) for r in c.execute('SELECT * FROM sales ORDER BY id DESC')],orders=[dict(r) for r in c.execute("SELECT d.*,COALESCE(l.map_url,'') AS map_url,COALESCE(l.notes,'') AS delivery_notes,COALESCE(p.method,'manual') AS payment_method,COALESCE(p.status,'unrecorded') AS payment_status FROM order_details d LEFT JOIN order_payments p ON p.sale=d.sale LEFT JOIN delivery_locations l ON l.sale=d.sale ORDER BY d.sale DESC")],audit=[dict(r) for r in c.execute('SELECT * FROM audit ORDER BY id DESC LIMIT 100')] if user['role']=='admin' else [],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions ORDER BY id DESC')],report=report)
 
 @web.post('/api/<kind>')
 def action(kind):
@@ -127,6 +127,8 @@ def action(kind):
    if rate_limited('order',10): return jsonify(error='Too many orders. Try again later.'),429
    if not d.get('phone','').strip() or (d.get('zone','pickup')!='pickup' and not d.get('address','').strip()): raise ValueError('Phone and delivery address required')
    if not d.get('request_id'): raise ValueError('Order request ID required')
+   with domain.connect() as c:
+    if domain.phone_verification.enabled() and not domain.phone_verification.verified(c,customer['id'],d.get('phone','')):return jsonify(error='Verify your phone number before ordering.'),403
    d=dict(d); d['customer']=customer['name']
    if not isinstance(d['request_id'],str) or not 16<=len(d['request_id'])<=128: raise ValueError()
    d['request_id']=hashlib.sha256((str(customer['id'])+':'+d['request_id']).encode()).hexdigest()
@@ -148,6 +150,8 @@ def action(kind):
   if kind=='manage_user':
    with domain.connect() as c: c.execute('DELETE FROM web_sessions WHERE username=?',(result['name'],))
   return jsonify(result)
+ except domain.shopping.ReviewRequired:
+  return jsonify(error='Prices changed. Review your order and try again.'),409
  except (ValueError,KeyError,TypeError,AttributeError,OverflowError,sqlite3.IntegrityError):
   return jsonify(error='Invalid request. Check the supplied fields and available stock.'),400
 
@@ -164,5 +168,7 @@ def serve():
 
 import accounts
 initialize_accounts,current_customer=accounts.install(__import__(__name__))
+domain.shopping.install(__import__(__name__))
+domain.phone_verification.install(__import__(__name__))
 
 if __name__=='__main__': serve()
