@@ -451,10 +451,16 @@
   "manualOrderHelp": "Contact the customer by phone or WhatsApp to confirm each pending order. WhatsApp opens a draft; review it and send it yourself. Change the order to processing after confirmation. Opening a contact link does not confirm an order or mark payment received.",
   "manualConfirmationCustomer": "Our staff will contact you by phone or WhatsApp to confirm your order and delivery or collection arrangements.",
   "productPhoto": "Product photo",
-  "photoHelp": "Find the product using the inventory search above, select it here, then upload its photo. Only workers and administrators can change photos. JPEG, PNG or WebP, up to 5 MB and 12 megapixels. Photos are resized for the shop.",
+  "photoHelp": "Search inventory above, then select the product here. Add up to six views. JPEG, PNG or WebP, up to 5 MB and 12 megapixels each. The cover photo appears in the shop; customers can browse all angles in Product details.",
   "choosePhoto": "Choose photo",
-  "uploadPhoto": "Upload / replace photo",
+  "uploadPhoto": "Upload selected photos",
   "photoSaved": "Photo saved. Customers can now see it.",
-  "photoInvalid": "Choose a JPEG, PNG or WebP photo up to 5 MB and 12 megapixels.",
-  "photoFailed": "Photo could not be saved. Check the file and try again."
+  "photoInvalid": "Choose JPEG, PNG or WebP photos up to 5 MB each. Maximum six photos per product.",
+  "photoFailed": "Upload could not be completed. Some photos may have saved; check the gallery before trying again.",
+  "photoDrop": "Drag and drop photos here, or click to choose",
+  "photoAngle": "Product view {number}",
+  "photoCover": "Cover photo",
+  "makeCover": "Make cover",
+  "removePhoto": "Remove photo",
+  "confirmRemovePhoto": "Remove this product photo? You can upload it again from your original file."
 }

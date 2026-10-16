@@ -7,7 +7,7 @@ for(const [htmlName,jsName] of [['index.html','site.js'],['staff.html','staff.js
  const ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(x=>x[1]));
  assert.equal(ids.size,[...html.matchAll(/\bid="([^"]+)"/g)].length,'Duplicate IDs in '+htmlName);
  for(const [,key] of html.matchAll(/data-(?:t|ph|aria)="([^"]+)"/g))assert.ok(en[key]&&ms[key],`${htmlName}: missing ${key}`);
- const dynamic=new Set(['detailSeller','detailAdd','detailPrice','reviewOrder','checkoutForm','checkoutError','checkoutMap','backToShopping','checkoutPhone','receiptOrders','bulkEnquiryForm','bulkError']);
+ const dynamic=new Set(['galleryMain','detailSeller','detailAdd','detailPrice','reviewOrder','checkoutForm','checkoutError','checkoutMap','backToShopping','checkoutPhone','receiptOrders','bulkEnquiryForm','bulkError']);
  for(const [,id] of js.matchAll(/\$\('([^']+)'\)/g))assert.ok(ids.has(id)||dynamic.has(id),`${jsName}: missing element ${id}`);
  assert.ok(!html.includes('SAR BAN')&&!html.includes('SYKT PG. SARBANUN'));
 }
@@ -23,6 +23,10 @@ vm.runInContext(fs.readFileSync('assets/i18n.js','utf8'),context);
  vm.runInContext(`data={companies:[{id:1,name:'Shop'}],products:[{id:1,name:'Drill',price:8900,category:'Power tools',sku:'D'}],stock:[{id:1,company:1,qty:2}],promotions:[]};add(1,1);add(1,1);add(1,1);`,context);
  assert.equal(vm.runInContext('cart.length',context),1);assert.equal(vm.runInContext('cart[0].qty',context),2);assert.equal(vm.runInContext('total()',context),17800);
  vm.runInContext("deliveryZones[1]='Tutong';saveCart();cart=[];readCart()",context);assert.equal(vm.runInContext('total()',context),18800);
+ const galleryPath='/product-photos/1/'+ 'a'.repeat(64)+'.jpg';
+ vm.runInContext(`data.products[0].photo_urls=[${JSON.stringify(galleryPath)},'/product-photos/1/'+ 'b'.repeat(64)+'.jpg'];detail(1)`,context);
+ assert.ok(element('detailContent').innerHTML.includes('data-photo-view='));assert.ok(element('detailContent').innerHTML.includes('Product view 2'));
+ listeners.click({target:{closest:()=>({dataset:{photoView:galleryPath}})}});assert.equal(element('galleryMain').src,galleryPath);
  const cartKey=[...storage.keys()].find(k=>k.endsWith('-cart'));storage.set(cartKey,JSON.stringify([{company:2,product:1,qty:1},{company:1,product:1,qty:-1}]));vm.runInContext('readCart()',context);assert.equal(vm.runInContext('cart.length',context),0);
  storage.set(cartKey,'bad');vm.runInContext('readCart()',context);assert.equal(vm.runInContext('cart.length',context),0);
  vm.runInContext("data.preview=true;checkout()",context);assert.ok(element('infoContent').innerHTML.includes(en.checkoutNotActive));assert.ok(element('infoContent').innerHTML.includes('checkoutForm'));assert.ok(element('infoContent').innerHTML.includes('disabled'));assert.ok(element('infoContent').innerHTML.includes('value="cod"'));

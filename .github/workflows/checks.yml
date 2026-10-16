@@ -35,3 +35,4 @@ jobs:
       - run: node --check assets/shop-settings.js
       - run: node --check assets/inventory.js
       - run: node --check assets/photos.js
+      - run: node test_photo_ui.cjs
