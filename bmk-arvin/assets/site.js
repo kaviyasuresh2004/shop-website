@@ -69,7 +69,7 @@ function checkout(values={}){
    const response=await fetch('/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
    const result=await response.json();if(!response.ok){if(response.status===409){data=await (await fetch('/api/catalog')).json();checkout(fields);$('checkoutError').textContent=t('orderChanged');return}throw Error(I18n.error(result.error));}
    I18n.storageSet(storageKey,'');if(!buyNowProduct)cart=[];buyNowProduct=null;saveCart();infoKind='receipt';
-   $('infoContent').innerHTML=`<h2>${esc(t('orderConfirmed'))}</h2><p>${esc(t('orderReceived',{id:result.sale,total:money(result.total)}))}</p><p>${esc(t('codHelp'))}</p><button class="button navy" id="receiptOrders">${esc(t('orderHistory'))}</button>`;
+   $('infoContent').innerHTML=`<h2>${esc(t('orderConfirmed'))}</h2><p>${esc(t('orderReceived',{id:result.sale,total:money(result.total)}))}</p><p>${esc(t('codHelp'))}</p><p>${esc(t('manualConfirmationCustomer'))}</p><button class="button navy" id="receiptOrders">${esc(t('orderHistory'))}</button>`;
    $('receiptOrders').onclick=()=>{CustomerAccount.open();CustomerAccount.refresh().then(()=>{CustomerAccount.mode='orders';CustomerAccount.render()});};
    try{data=await (await fetch('/api/catalog')).json();reconcileCart();render();renderCart()}catch{}
   }catch(err){if($('checkoutError'))$('checkoutError').textContent=err.message||t('networkError');button.disabled=false}

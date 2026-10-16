@@ -427,7 +427,7 @@
   "colMap_url": "Delivery map",
   "colDelivery_notes": "Delivery instructions",
   "colDetails": "Request details",
-  "otpUnavailable": "Phone verification is not available yet.",
+  "otpUnavailable": "Our staff may call or WhatsApp you to confirm your order.",
   "phoneVerification": "Phone verification",
   "phoneVerified": "Your saved account phone number is verified.",
   "otpHelp": "Send a verification code to your saved account phone number. Update the number in Account → Personal details first if needed. Sending shares it with our verification provider.",
@@ -442,5 +442,12 @@
   "bulkInvalid": "Enter a phone number and at least 10 characters describing your request.",
   "bulkLimit": "Too many enquiries. Please contact the shop or try later.",
   "updateStatus": "Update status",
-  "colItems": "Ordered items"
+  "colItems": "Ordered items",
+  "colContact": "Contact customer",
+  "checkContactNumber": "Check country code and phone number",
+  "callCustomer": "Call customer",
+  "whatsappCustomer": "Open WhatsApp draft",
+  "orderWhatsappDraft": "Hello {name}, this is {shop} about order #{id}, total {total}. Please confirm that you would like to proceed and confirm your delivery or collection arrangements. Thank you.",
+  "manualOrderHelp": "Contact the customer by phone or WhatsApp to confirm each pending order. WhatsApp opens a draft; review it and send it yourself. Change the order to processing after confirmation. Opening a contact link does not confirm an order or mark payment received.",
+  "manualConfirmationCustomer": "Our staff will contact you by phone or WhatsApp to confirm your order and delivery or collection arrangements."
 }

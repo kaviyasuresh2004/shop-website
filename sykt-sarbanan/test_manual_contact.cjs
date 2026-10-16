@@ -1,0 +1,13 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const dictionary=JSON.parse(fs.readFileSync(__dirname+'/assets/en.json','utf8'));
+const context={document:{getElementById(){},addEventListener(){}},I18n:{t(key,vars={}){let value=dictionary[key]||key;for(const[k,v]of Object.entries(vars))value=value.replaceAll('{'+k+'}',String(v));return value;}}};
+vm.createContext(context);vm.runInContext(fs.readFileSync(__dirname+'/assets/staff.js','utf8').replace(/^start\(\);$/m,''),context);
+vm.runInContext("data={companies:[{id:1,name:'Test shop'}]}",context);
+assert.equal(vm.runInContext("contactNumber('123 4567')",context),'6731234567');
+assert.equal(vm.runInContext("contactNumber('+673 1234567')",context),'6731234567');
+assert.equal(vm.runInContext("contactNumber('00673 1234567')",context),'6731234567');
+for(const number of ['javascript:alert(1)','123','123456789','+673<invalid>'])assert.equal(vm.runInContext(`contactNumber(${JSON.stringify(number)})`,context),null);
+const links=vm.runInContext("contactLinks({sale:12,customer:'<script>test</script>',phone:'1234567',total:7900})",context);
+assert.ok(links.includes('href="tel:+6731234567"'));assert.ok(links.includes('https://wa.me/6731234567?text='));assert.ok(links.includes('BND%2079.00'));assert.ok(links.includes('%2312'));assert.ok(!links.includes('<script>'));assert.ok(links.includes('noopener noreferrer'));
+assert.ok(vm.runInContext("contactLinks({phone:'bad'})",context).includes(dictionary.checkContactNumber));
+console.log('PASS: manual contact phone normalization, safe draft links, order reference, total, invalid-number handling. No messages sent.');

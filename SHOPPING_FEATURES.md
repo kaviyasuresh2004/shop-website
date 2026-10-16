@@ -20,6 +20,8 @@ Signed-in customers submit a phone number and product/quantity/delivery requirem
 
 ## Phone OTP: prepared, inactive by default
 
+The owner chose manual phone/WhatsApp order confirmation for launch. Worker order rows include **Call customer** and **Open WhatsApp draft**. A seven-digit local number is treated as Brunei; international numbers require a country code. Invalid numbers get a correction notice instead of a broken link. The draft contains the shop name, customer name, order reference and total; it contains no delivery address. Staff review and send the draft themselves, then change the order to processing after customer confirmation. Opening either contact link does not update order or payment status. No automatic messages are sent by the website.
+
 Phone codes need a separate verification-provider account and paid delivery. No provider account, credentials or billing was supplied for this upgrade. Both production services should keep `PHONE_OTP_ENABLED` unset/false. The UI clearly states that verification is unavailable; it never marks an unverified phone as verified.
 
 The prepared adapter uses Twilio Verify and supports SMS or WhatsApp. After confirming Brunei availability and pricing, configure each Railway service privately with `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, its own `TWILIO_VERIFY_SERVICE_SID`, `PHONE_OTP_CHANNEL` (`sms` or `whatsapp`) and `PHONE_OTP_ENABLED=true`. Use separate Verify services for isolation. Never put tokens into Git, browser code or chat. Perform a real delivery/verification test before enabling it for shoppers. WhatsApp availability and approval must be checked with the provider; SMS can be used when a customer lacks WhatsApp. No fallback sends automatically.

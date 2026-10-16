@@ -397,7 +397,7 @@
   "colMap_url": "Peta penghantaran",
   "colDelivery_notes": "Arahan penghantaran",
   "colDetails": "Butiran permintaan",
-  "otpUnavailable": "Pengesahan telefon belum tersedia.",
+  "otpUnavailable": "Kakitangan kami mungkin menelefon atau menghantar WhatsApp untuk mengesahkan pesanan anda.",
   "phoneVerification": "Pengesahan telefon",
   "phoneVerified": "Nombor telefon akaun anda telah disahkan.",
   "otpHelp": "Hantar kod pengesahan ke nombor telefon akaun anda. Kemas kini nombor dalam Akaun → Butiran peribadi dahulu jika perlu. Penghantaran berkongsi nombor dengan penyedia pengesahan kami.",
@@ -412,5 +412,12 @@
   "bulkInvalid": "Masukkan nombor telefon dan sekurang-kurangnya 10 aksara menerangkan permintaan anda.",
   "bulkLimit": "Terlalu banyak pertanyaan. Hubungi kedai atau cuba kemudian.",
   "updateStatus": "Kemas kini status",
-  "colItems": "Item dipesan"
+  "colItems": "Item dipesan",
+  "colContact": "Hubungi pelanggan",
+  "checkContactNumber": "Semak kod negara dan nombor telefon",
+  "callCustomer": "Telefon pelanggan",
+  "whatsappCustomer": "Buka draf WhatsApp",
+  "orderWhatsappDraft": "Salam {name}, kami dari {shop} berkenaan pesanan #{id}, jumlah {total}. Sila sahkan bahawa anda ingin meneruskan pesanan dan sahkan urusan penghantaran atau pengambilan. Terima kasih.",
+  "manualOrderHelp": "Hubungi pelanggan melalui telefon atau WhatsApp untuk mengesahkan pesanan. WhatsApp membuka draf; semak dan hantarnya sendiri. Tukar status kepada processing selepas pengesahan. Membuka pautan tidak mengesahkan pesanan atau bayaran.",
+  "manualConfirmationCustomer": "Kakitangan kami akan menghubungi anda melalui telefon atau WhatsApp untuk mengesahkan pesanan dan urusan penghantaran atau pengambilan."
 }
