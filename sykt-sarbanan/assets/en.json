@@ -482,5 +482,16 @@
   "companyEmail": "Company email",
   "registrationNumber": "Company registration number",
   "companyDescription": "About the company",
-  "companyWhatsapp": "Company WhatsApp number"
+  "companyWhatsapp": "Company WhatsApp number",
+  "deliveryChargeMode": "Delivery pricing",
+  "fixedDeliveryCharges": "Confirmed regional charges",
+  "estimatedDeliveryCharges": "Estimated regional charges - worker confirms",
+  "deliveryEstimateHelp": "Delivery charges and the total shown are estimates. Our worker will agree the final delivery charge with you before dispatch. No online payment is taken.",
+  "confirmDeliveryCharge": "Confirm delivery charge",
+  "confirmDeliveryHelp": "Contact the customer and agree the final delivery charge for an estimated-delivery order. Record the agreed charge here before marking it Ready or collecting payment. Product prices and quantities stay unchanged.",
+  "finalDeliveryFee": "Agreed delivery charge (BND)",
+  "customerAgreedFee": "I have agreed this delivery charge with the customer.",
+  "deliveryNeedsConfirmation": "Estimated delivery - confirm with customer",
+  "deliveryConfirmed": "Delivery charge confirmed",
+  "colDelivery_confirmation": "Delivery confirmation"
 }

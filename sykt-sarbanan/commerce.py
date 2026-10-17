@@ -2,7 +2,7 @@
 import json
 from urllib.parse import urlsplit
 
-DEFAULTS={'email':'','registration_number':'','company_description':'','whatsapp':'','facebook_url':'','instagram_url':'','legal_name':'','registered_address':'','incorporation_date':'','address':'','phone':'','hours':'','map_url':'','delivery_policy':'','returns_policy':'','privacy_policy':'','checkout_enabled':False,'catalogue_confirmed':False,'delivery_fees':{'pickup':0,'Brunei-Muara':500,'Tutong':1000,'Belait':1500,'Temburong':2000}}
+DEFAULTS={'delivery_charge_mode':'fixed','email':'','registration_number':'','company_description':'','whatsapp':'','facebook_url':'','instagram_url':'','legal_name':'','registered_address':'','incorporation_date':'','address':'','phone':'','hours':'','map_url':'','delivery_policy':'','returns_policy':'','privacy_policy':'','checkout_enabled':False,'catalogue_confirmed':False,'delivery_fees':{'pickup':0,'Brunei-Muara':500,'Tutong':1000,'Belait':1500,'Temburong':2000}}
 
 def initialize(c):
  c.executescript('''CREATE TABLE IF NOT EXISTS shop_settings(id INTEGER PRIMARY KEY CHECK(id=1),data TEXT NOT NULL);
@@ -34,6 +34,9 @@ def save(c,d):
  for value in fees.values():
   if isinstance(value,bool) or not isinstance(value,int) or not 0<=value<=1000000:raise ValueError()
  if fees['pickup']!=0:raise ValueError()
+ mode=d.get('delivery_charge_mode',old.get('delivery_charge_mode','fixed'))
+ if mode not in ('fixed','estimate'):raise ValueError()
+ result['delivery_charge_mode']=mode
  result['delivery_fees']=fees
  if result['checkout_enabled'] and not result['catalogue_confirmed']:
   raise ValueError()

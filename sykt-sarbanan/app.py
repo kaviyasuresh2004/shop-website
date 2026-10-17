@@ -1,5 +1,6 @@
 import mimetypes
 import commerce
+import delivery
 import inventory
 import shopping
 import phone_verification
@@ -45,6 +46,7 @@ def init():
    c.executemany('INSERT INTO stock VALUES (?,?,?)',[(company,p,30 if company==1 else 20) for company in (1,) for p in range(1,7)])
    audit(c,'system','setup','Sample catalogue and stock created; replace before real use')
   commerce.initialize(c)
+  delivery.initialize(c)
   inventory.initialize(c)
   shopping.initialize(c)
   phone_verification.initialize(c)
@@ -98,7 +100,8 @@ def operation(user,kind,d,*,customer_id=None):
    items=d['items']; customer=d.get('customer','').strip(); zone=d.get('zone','pickup')
    if not customer or not items: raise ValueError('Customer and items required')
    if not isinstance(items,list) or len(items)>100 or len(customer)>200 or len(d.get('phone',''))>80 or len(d.get('address',''))>1000: raise ValueError('Invalid order details')
-   fees=commerce.load(c)['delivery_fees']
+   settings=commerce.load(c);fees=settings['delivery_fees']
+   delivery_estimated=kind=='order' and zone!='pickup' and settings['delivery_charge_mode']=='estimate'
    if zone not in fees: raise ValueError('Unknown delivery region')
    total=fees[zone]; combined={}
    for item in items:
@@ -115,6 +118,7 @@ def operation(user,kind,d,*,customer_id=None):
    if kind=='order' and 'reviewed_total' in d and integer(d['reviewed_total'])!=total:raise shopping.ReviewRequired()
    sale=c.execute('INSERT INTO sales(company,customer,items,total,delivery) VALUES (?,?,?,?,?)',(company,customer,json.dumps(lines),total,fees[zone])).lastrowid
    c.execute('INSERT INTO order_details(sale,channel,address,phone,zone,status) VALUES (?,?,?,?,?,?)',(sale,'online' if kind=='order' else 'shop',d.get('address','').strip(),d.get('phone','').strip(),zone,'pending' if kind=='order' else 'completed'))
+   if delivery_estimated:c.execute('INSERT INTO delivery_confirmations(sale) VALUES (?)',(sale,))
    if kind=='order':
     link=shopping.map_link(d.get('map_url',''));notes=d.get('delivery_notes','')
     if not isinstance(notes,str) or len(notes)>1000:raise ValueError()
@@ -123,7 +127,7 @@ def operation(user,kind,d,*,customer_id=None):
     c.execute('INSERT INTO order_owners VALUES (?,?)',(sale,customer_id))
     if d.get('payment_method','cod')!='cod':raise ValueError('Unsupported payment method')
     c.execute('INSERT INTO order_payments VALUES (?,?,?)',(sale,'cod','pending'))
-   result={'sale':sale,'total':total}
+   result={'sale':sale,'total':total,'delivery_estimated':delivery_estimated}
    if request_key: c.execute('INSERT INTO order_requests VALUES (?,?,?)',(request_key,fingerprint,json.dumps(result)))
    audit(c,user['name'],'order received' if kind=='order' else 'completed sale',{'sale':sale,'company':company,'zone':zone}); return result
   elif kind=='product':
@@ -140,11 +144,15 @@ def operation(user,kind,d,*,customer_id=None):
    pid=integer(d['product'])
    c.execute('DELETE FROM promotions WHERE product=?',(pid,)); c.execute('DELETE FROM stock WHERE id=?',(pid,)); c.execute('DELETE FROM products WHERE id=?',(pid,))
    audit(c,user['name'],'product deleted',{'product':pid})
+  elif kind=='delivery_quote':
+   return delivery.confirm(__import__(__name__),c,user,d)
   elif kind=='payment_received':
    sale=integer(d['sale'])
+   if delivery.pending(c,sale):raise ValueError('Confirm delivery charge first')
    if c.execute("UPDATE order_payments SET status='paid' WHERE sale=? AND method='cod'",(sale,)).rowcount!=1:raise ValueError('Unknown COD order')
    audit(c,user['name'],'cash collected',{'sale':sale})
   elif kind=='order_status':
+   if d['status'] in ('ready','delivered','completed') and delivery.pending(c,integer(d['sale'])):raise ValueError('Confirm delivery charge first')
    if d['status'] not in ('pending','processing','ready','delivered','completed'): raise ValueError('Invalid order status')
    if c.execute('UPDATE order_details SET status=? WHERE sale=?',(d['status'],integer(d['sale']))).rowcount!=1: raise ValueError('Unknown order')
    audit(c,user['name'],'order status',d)

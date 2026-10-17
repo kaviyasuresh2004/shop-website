@@ -452,5 +452,16 @@
   "companyEmail": "E-mel syarikat",
   "registrationNumber": "Nombor pendaftaran syarikat",
   "companyDescription": "Tentang syarikat",
-  "companyWhatsapp": "Nombor WhatsApp syarikat"
+  "companyWhatsapp": "Nombor WhatsApp syarikat",
+  "deliveryChargeMode": "Harga penghantaran",
+  "fixedDeliveryCharges": "Caj mengikut kawasan disahkan",
+  "estimatedDeliveryCharges": "Anggaran caj kawasan - pekerja mengesahkan",
+  "deliveryEstimateHelp": "Caj penghantaran dan jumlah yang dipaparkan ialah anggaran. Pekerja kami akan bersetuju dengan anda tentang caj akhir sebelum penghantaran. Tiada bayaran dalam talian diambil.",
+  "confirmDeliveryCharge": "Sahkan caj penghantaran",
+  "confirmDeliveryHelp": "Hubungi pelanggan dan persetujui caj akhir bagi pesanan dengan anggaran penghantaran. Catat caj sebelum menandakan Sedia atau menerima bayaran. Harga dan kuantiti produk tidak berubah.",
+  "finalDeliveryFee": "Caj penghantaran dipersetujui (BND)",
+  "customerAgreedFee": "Saya telah mempersetujui caj penghantaran ini dengan pelanggan.",
+  "deliveryNeedsConfirmation": "Anggaran penghantaran - sahkan dengan pelanggan",
+  "deliveryConfirmed": "Caj penghantaran disahkan",
+  "colDelivery_confirmation": "Pengesahan penghantaran"
 }

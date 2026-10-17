@@ -17,3 +17,5 @@ Cash is initially **pending**. Staff should use **Mark cash collected** only aft
 Saved shop settings take precedence over the original SHOP_MODE default. Until settings are saved, the existing environment default is retained. Existing orders remain unchanged; older orders without a payment record are labelled manual / payment not recorded rather than assumed paid or COD.
 
 Bank transfer remains deferred. A future version can show verified company bank details and record staff confirmation of receipt. No bank integration or automatic bank reconciliation is included now.
+
+Delivery charge mode: Estimate shows regional charges as estimates. Workers must agree the final fee with the customer and use Confirm delivery charge before marking ready or collecting payment. This adjusts delivery totals only, preserving product prices and stock.
