@@ -35,7 +35,7 @@ def save(c,d):
   if isinstance(value,bool) or not isinstance(value,int) or not 0<=value<=1000000:raise ValueError()
  if fees['pickup']!=0:raise ValueError()
  result['delivery_fees']=fees
- if result['checkout_enabled'] and (not result['catalogue_confirmed'] or any(not result[k] for k in ('address','phone','hours','delivery_policy','returns_policy','privacy_policy'))):
+ if result['checkout_enabled'] and not result['catalogue_confirmed']:
   raise ValueError()
  c.execute('INSERT INTO shop_settings VALUES (1,?) ON CONFLICT(id) DO UPDATE SET data=excluded.data',(json.dumps(result),))
  return result

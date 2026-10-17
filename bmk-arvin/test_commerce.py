@@ -35,3 +35,24 @@ class CommerceTests(unittest.TestCase):
   self.assertEqual(self.post('order',dict(self.order(),payment_method='bank')).status_code,400);self.assertEqual(self.qty(),30)
   self.post('shop-settings',dict(self.settings(),checkout_enabled=False))
   self.assertTrue(self.client.get('/api/catalog').json['preview']);self.assertEqual(self.post('order',self.order()).status_code,403)
+
+ def test_confirmed_positive_stock_can_checkout_before_full_company_details(self):
+  self.login()
+  settings=self.settings()
+  for key in ['address','phone','hours','delivery_policy','returns_policy','privacy_policy']:settings[key]=''
+  self.assertEqual(self.post('shop-settings',settings).status_code,200)
+  self.assertFalse(self.client.get('/api/catalog').json['preview'])
+  result=self.post('order',dict(self.order(),payment_method='cod'))
+  self.assertEqual(result.status_code,200)
+  self.assertEqual(self.client.get('/api/staff').json['orders'][0]['sale'],result.json['sale'])
+  self.assertEqual(self.qty(),28)
+ def test_zero_stock_missing_price_and_held_stock_cannot_checkout(self):
+  import app
+  self.login();self.post('shop-settings',self.settings())
+  with app.connect() as c:
+   c.execute('UPDATE stock SET qty=0 WHERE id=2')
+   c.execute('UPDATE products SET price=0 WHERE id=3')
+   c.execute("INSERT INTO inventory_source VALUES (4,'fractional','16.5','',1)")
+  for product in [2,3,4]:
+   self.assertEqual(self.post('order',{**self.order(),'items':[{'product':product,'qty':1}],'request_id':'blocked-stock-product-'+str(product)}).status_code,400)
+  self.assertEqual(self.qty(),30)

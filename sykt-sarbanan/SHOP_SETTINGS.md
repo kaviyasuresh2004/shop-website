@@ -6,7 +6,9 @@ You can edit the address, phone, opening hours, HTTPS map link, delivery charges
 
 ## Before accepting real orders
 
-Replace the sample catalogue, quantities and prices. Complete the shop contact information and all policies, check currency and delivery charges, then tick the confirmation and **Accept cash-on-delivery / cash-on-collection orders** and save. Settings can be saved as a draft without enabling checkout. The server refuses activation with missing contact information/policies or without catalogue confirmation. Do not confirm while sample stock/prices are still being used.
+Confirm that published products, available positive stock and prices are correct, then tick the confirmation and **Accept cash-on-delivery / cash-on-collection orders** and save. A physical count of zero or negative source quantities does not block sales of currently available positive stock. Zero stock, missing prices and fractional-stock holds remain unavailable online.
+
+Company contact information and policy text can be completed later. They no longer block checkout activation. Confirm delivery charges before saving activation; do not assume the original default regional rates have been approved. Staff manually contact customers about pending orders.
 
 The checkout form shows items, delivery cost, total and cash payment. Customers must sign in. The server calculates prices and delivery charges, rejects unsupported payment methods, and records order ownership and payment status with the stock update. Repeated submission of the same request does not create a second order. Cash on collection is used for pickup; cash on delivery is used for deliveries.
 
