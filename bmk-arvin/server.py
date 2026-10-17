@@ -90,6 +90,17 @@ def catalog():
   ids={r['id'] for r in c.execute('SELECT id FROM products') if user or domain.inventory.available(c,r['id'])}
   return jsonify(shop_slug=domain.CONFIG['slug'],companies=[dict(r) for r in c.execute('SELECT * FROM companies')],products=[dict(r,photo_url=next(iter(photo_urls.get(r['id'],[])),''),photo_urls=photo_urls.get(r['id'],[])) for r in c.execute('SELECT * FROM products') if r['id'] in ids],stock=[dict(r) for r in c.execute('SELECT * FROM stock') if r['id'] in ids],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions WHERE active=1') if domain.promotion_valid(r)],setup=not bool(c.execute('SELECT 1 FROM users').fetchone()),setupProtected=PRODUCTION,preview=not domain.commerce.load(c,not PREVIEW)['checkout_enabled'],shopDetails=domain.commerce.load(c,not PREVIEW))
 
+@web.get('/api/inventory-audit')
+def inventory_audit():
+ user=signed_in()
+ if not user:return jsonify(error='Sign in required'),401
+ if user['role']!='admin':return jsonify(error='Administrator access required'),403
+ with domain.connect() as c:
+  result=dict(shop=domain.CONFIG['slug'],company=domain.CONFIG['name'],products=[dict(r) for r in c.execute('SELECT * FROM products ORDER BY id')],stock=[dict(r) for r in c.execute('SELECT * FROM stock ORDER BY id')],source=[dict(r) for r in c.execute('SELECT * FROM inventory_source ORDER BY product')],imports=[dict(r) for r in c.execute('SELECT * FROM catalogue_imports')],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions')],changes=[dict(r) for r in c.execute("SELECT * FROM audit WHERE action IN ('product saved','stock adjustment','stock import row','catalogue imported','promotion created','promotion disabled') ORDER BY id DESC LIMIT 1000")])
+ response=jsonify(result)
+ response.headers['Content-Disposition']='attachment; filename="'+domain.CONFIG['slug']+'-inventory-audit.json"'
+ return response
+
 @web.get('/api/staff')
 def staff():
  user=signed_in()

@@ -473,5 +473,6 @@
   "previewCategories": "Preview category groups",
   "applyCategories": "Apply these category groups",
   "categoryPreviewSummary": "{count} products can be grouped; {remaining} need manual review.",
-  "categoryApplied": "Grouped {count} products. Remaining unclear items need manual review."
+  "categoryApplied": "Grouped {count} products. Remaining unclear items need manual review.",
+  "downloadInventoryAudit": "Download inventory audit"
 }

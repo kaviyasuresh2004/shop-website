@@ -9,7 +9,7 @@ for(const [htmlName,jsName] of [['index.html','site.js'],['staff.html','staff.js
  for(const [,key] of html.matchAll(/data-(?:t|ph|aria)="([^"]+)"/g))assert.ok(en[key]&&ms[key],`${htmlName}: missing ${key}`);
  const dynamic=new Set(['galleryMain','detailSeller','detailAdd','detailPrice','reviewOrder','checkoutForm','checkoutError','checkoutMap','backToShopping','checkoutPhone','receiptOrders','bulkEnquiryForm','bulkError']);
  for(const [,id] of js.matchAll(/\$\('([^']+)'\)/g))assert.ok(ids.has(id)||dynamic.has(id),`${jsName}: missing element ${id}`);
- assert.ok(!html.includes('SAR BAN')&&!html.includes('SYKT PG. SARBANUN'));
+ assert.ok(!html.includes('SAR BAN'));
 }
 const selectors=new Map(),events=[],listeners={},storage=new Map();
 const element=id=>selectors.get(id)||selectors.set(id,{value:'',innerHTML:'',textContent:'',hidden:true,open:false,dataset:{},elements:{customer:{value:''},phone:{value:''},address:{value:''}},classList:{toggle(){}},setAttribute(){},addEventListener(){},querySelectorAll(){return []},showModal(){this.open=true},close(){this.open=false},scrollIntoView(){}}).get(id);

@@ -443,5 +443,6 @@
   "previewCategories": "Pratonton kumpulan kategori",
   "applyCategories": "Gunakan kumpulan kategori ini",
   "categoryPreviewSummary": "{count} produk boleh dikumpulkan; {remaining} perlu semakan manual.",
-  "categoryApplied": "{count} produk dikumpulkan. Produk tidak jelas masih memerlukan semakan manual."
+  "categoryApplied": "{count} produk dikumpulkan. Produk tidak jelas masih memerlukan semakan manual.",
+  "downloadInventoryAudit": "Muat turun audit inventori"
 }

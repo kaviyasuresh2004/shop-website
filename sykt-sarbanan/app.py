@@ -49,6 +49,10 @@ def init():
   shopping.initialize(c)
   phone_verification.initialize(c)
   companies=c.execute('SELECT id,name FROM companies').fetchall()
+  if CONFIG['slug']=='sykt-sarbanan' and CONFIG['name']=='SYKT PG. SARBANUN SDN BHD' and len(companies)==1 and companies[0]['id']==1 and companies[0]['name']=='SYKT SARBANAN SDN BHD':
+   c.execute('UPDATE companies SET name=? WHERE id=1',(CONFIG['name'],))
+   audit(c,'system','company name corrected',{'before':'SYKT SARBANAN SDN BHD','after':CONFIG['name']})
+   companies=c.execute('SELECT id,name FROM companies').fetchall()
   if len(companies)!=1 or companies[0]['id']!=1 or companies[0]['name']!=CONFIG['name']: raise ValueError('Database identity mismatch: use only this shop database')
 def audit(c,actor,action,detail): c.execute('INSERT INTO audit(actor,action,detail) VALUES (?,?,?)',(actor,action,json.dumps(detail)))
 def password_hash(p,s): return hashlib.pbkdf2_hmac('sha256',p.encode(),s.encode(),200000).hex()
