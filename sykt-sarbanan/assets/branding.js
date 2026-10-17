@@ -1,0 +1,17 @@
+window.applyCompanyBranding=function(catalog){
+ const details=catalog.shopDetails||{},url=/^\/company-logo\/[a-f0-9]{64}\.jpg$/.test(catalog.logo_url||'')?catalog.logo_url:'';
+ document.querySelectorAll('a.brand').forEach(brand=>{let image=brand.querySelector('[data-company-logo]');if(url){if(!image){image=document.createElement('img');image.dataset.companyLogo='';image.style.cssText='max-width:96px;max-height:64px;object-fit:contain;flex-shrink:0';brand.prepend(image);}image.src=url;image.alt=details.legal_name||catalog.companies?.[0]?.name||'';}else image?.remove();const icon=brand.querySelector('svg');if(icon)icon.style.display=url?'none':'';});
+ let company=document.getElementById('companyPublicDetails');if(!company){company=document.createElement('div');company.id='companyPublicDetails';document.querySelector('.shop-info')?.append(company);}company.replaceChildren();
+ for(const value of [details.company_description,details.registration_number?I18n.t('registrationNumber')+': '+details.registration_number:'']){if(value){const line=document.createElement('p');line.textContent=value;line.style.whiteSpace='pre-wrap';company.append(line);}}
+ const links=[];if(details.email)links.push([details.email,'mailto:'+encodeURIComponent(details.email)]);
+ for(const [key,label] of [['facebook_url','Facebook'],['instagram_url','Instagram']]){if(/^https:\/\//.test(details[key]||''))links.push([label,details[key]]);}
+ const phone=String(details.whatsapp||'').replace(/[\s()+-]/g,'');const number=/^\d{7}$/.test(phone)?'673'+phone:phone;if(/^[1-9]\d{7,14}$/.test(number))links.push(['WhatsApp','https://wa.me/'+number]);
+ if(links.length){const line=document.createElement('p');for(const [label,href] of links){const link=document.createElement('a');link.textContent=label;link.href=href;link.style.marginRight='16px';link.rel='noopener noreferrer';line.append(link);}company.append(line);const footer=document.querySelector('[data-t="socialPending"]');if(footer){footer.replaceChildren(line.cloneNode(true));}}
+};
+document.addEventListener('DOMContentLoaded',()=>{
+ const form=document.getElementById('companyLogoForm');if(!form)return;
+ const file=document.getElementById('companyLogoFile'),preview=document.getElementById('companyLogoPreview'),result=document.getElementById('companyLogoResult');let localUrl;
+ const original=window.renderShopSettings;window.renderShopSettings=(current,catalog)=>{original?.(current,catalog);window.applyCompanyBranding(catalog);if(current.user.role==='admin'&&!file.files.length){preview.src=catalog.logo_url||'';preview.hidden=!catalog.logo_url;}};
+ file.addEventListener('change',()=>{if(localUrl)URL.revokeObjectURL(localUrl);const photo=file.files[0];if(photo){localUrl=URL.createObjectURL(photo);preview.src=localUrl;preview.hidden=false;}});
+ form.addEventListener('submit',async event=>{event.preventDefault();const photo=file.files[0];if(!photo||photo.size>5000000||!['image/jpeg','image/png','image/webp'].includes(photo.type)){result.textContent=t('photoInvalid');return;}const button=form.querySelector('button');button.disabled=true;result.textContent='';try{const image=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result.split(',')[1]);reader.onerror=reject;reader.readAsDataURL(photo);});await api('company-logo',{image});file.value='';await load();result.textContent=t('logoSaved');}catch{result.textContent=t('photoFailed');}finally{button.disabled=false;}});
+});

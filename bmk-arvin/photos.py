@@ -25,22 +25,7 @@ def save(domain,user,d):
   return {'ok':True}
  if action not in ('add','replace'):raise ValueError('Invalid photo action')
  encoded=d['image']
- if not isinstance(encoded,str) or len(encoded)>7_000_000: raise ValueError('Photo too large')
- try:
-  raw=base64.b64decode(encoded,validate=True)
-  if not raw or len(raw)>5_000_000: raise ValueError('Photo too large')
-  with warnings.catch_warnings():
-   warnings.simplefilter('error',Image.DecompressionBombWarning)
-   with Image.open(io.BytesIO(raw)) as source:
-    if source.format not in ('JPEG','PNG','WEBP') or source.width*source.height>12_000_000: raise ValueError('Unsupported photo')
-    source.load()
-    image=ImageOps.exif_transpose(source).convert('RGBA')
-    image.thumbnail((1600,1600))
-    background=Image.new('RGB',image.size,'white');background.paste(image,mask=image.getchannel('A'))
-    output=io.BytesIO();background.save(output,format='JPEG',quality=85,optimize=True)
-    content=output.getvalue()
- except (binascii.Error,UnidentifiedImageError,OSError,Image.DecompressionBombError,Image.DecompressionBombWarning) as exc:
-  raise ValueError('Invalid photo') from exc
+ content=normalise(encoded)
  digest=hashlib.sha256(content).hexdigest()
  with domain.LOCK,domain.connect() as c:
   if not c.execute('SELECT 1 FROM products WHERE id=?',(product,)).fetchone(): raise ValueError('Unknown product')
@@ -58,3 +43,22 @@ def urls(c):
  for r in c.execute('SELECT product,digest FROM product_gallery ORDER BY product,position,digest'):
   result.setdefault(r['product'],[]).append(f"/product-photos/{r['product']}/{r['digest']}.jpg")
  return result
+
+def normalise(encoded):
+ if not isinstance(encoded,str) or len(encoded)>7_000_000: raise ValueError('Photo too large')
+ try:
+  raw=base64.b64decode(encoded,validate=True)
+  if not raw or len(raw)>5_000_000: raise ValueError('Photo too large')
+  with warnings.catch_warnings():
+   warnings.simplefilter('error',Image.DecompressionBombWarning)
+   with Image.open(io.BytesIO(raw)) as source:
+    if source.format not in ('JPEG','PNG','WEBP') or source.width*source.height>12_000_000: raise ValueError('Unsupported photo')
+    source.load()
+    image=ImageOps.exif_transpose(source).convert('RGBA')
+    image.thumbnail((1600,1600))
+    background=Image.new('RGB',image.size,'white');background.paste(image,mask=image.getchannel('A'))
+    output=io.BytesIO();background.save(output,format='JPEG',quality=85,optimize=True)
+    content=output.getvalue()
+ except (binascii.Error,UnidentifiedImageError,OSError,Image.DecompressionBombError,Image.DecompressionBombWarning) as exc:
+  raise ValueError('Invalid photo') from exc
+ return content

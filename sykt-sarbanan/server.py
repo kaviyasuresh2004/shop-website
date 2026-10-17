@@ -5,6 +5,7 @@ from urllib.parse import urlsplit
 from flask import Flask,request,jsonify,send_from_directory
 import app as domain
 import photos
+import branding
 import categorisation
 from flask import Response
 
@@ -24,6 +25,7 @@ def initialize():
  initialize_accounts()
  with domain.connect() as c:
   photos.initialize(c)
+  branding.initialize(c)
   c.execute('CREATE TABLE IF NOT EXISTS web_sessions(token TEXT PRIMARY KEY,username TEXT REFERENCES users(name) ON DELETE CASCADE,expires INTEGER)')
 
 def public_origin():
@@ -88,7 +90,7 @@ def catalog():
  with domain.connect() as c:
   photo_urls=photos.urls(c)
   ids={r['id'] for r in c.execute('SELECT id FROM products') if user or domain.inventory.available(c,r['id'])}
-  return jsonify(shop_slug=domain.CONFIG['slug'],companies=[dict(r) for r in c.execute('SELECT * FROM companies')],products=[dict(r,photo_url=next(iter(photo_urls.get(r['id'],[])),''),photo_urls=photo_urls.get(r['id'],[])) for r in c.execute('SELECT * FROM products') if r['id'] in ids],stock=[dict(r) for r in c.execute('SELECT * FROM stock') if r['id'] in ids],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions WHERE active=1') if domain.promotion_valid(r)],setup=not bool(c.execute('SELECT 1 FROM users').fetchone()),setupProtected=PRODUCTION,preview=not domain.commerce.load(c,not PREVIEW)['checkout_enabled'],shopDetails=domain.commerce.load(c,not PREVIEW))
+  return jsonify(logo_url=branding.url(c),shop_slug=domain.CONFIG['slug'],companies=[dict(r) for r in c.execute('SELECT * FROM companies')],products=[dict(r,photo_url=next(iter(photo_urls.get(r['id'],[])),''),photo_urls=photo_urls.get(r['id'],[])) for r in c.execute('SELECT * FROM products') if r['id'] in ids],stock=[dict(r) for r in c.execute('SELECT * FROM stock') if r['id'] in ids],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions WHERE active=1') if domain.promotion_valid(r)],setup=not bool(c.execute('SELECT 1 FROM users').fetchone()),setupProtected=PRODUCTION,preview=not domain.commerce.load(c,not PREVIEW)['checkout_enabled'],shopDetails=domain.commerce.load(c,not PREVIEW))
 
 @web.get('/api/inventory-audit')
 def inventory_audit():
@@ -151,6 +153,9 @@ def action(kind):
    return jsonify(domain.operation({'name':customer['email'],'role':'customer','company':1},kind,d,customer_id=customer['id']))
   user=signed_in()
   if not user: return jsonify(error='Sign in required'),401
+  if kind=='company-logo':
+   if user['role']!='admin':return jsonify(error='Administrator access required'),403
+   return jsonify(branding.save(domain,user,d))
   if kind=='categorise':
    if user['role']!='admin':return jsonify(error='Administrator access required'),403
    return jsonify(categorisation.run(domain,user,d))
@@ -208,5 +213,11 @@ def product_photo(product,digest):
  response=Response(bytes(row['image']),mimetype='image/jpeg')
  response.headers['Cache-Control']='public,max-age=31536000,immutable'
  return response
+
+@web.get('/company-logo/<digest>.jpg')
+def company_logo(digest):
+ with domain.connect() as c:row=c.execute('SELECT image FROM company_logo WHERE id=1 AND digest=?',(digest,)).fetchone()
+ if not row:return '',404
+ response=Response(bytes(row['image']),mimetype='image/jpeg');response.headers['Cache-Control']='public,max-age=31536000,immutable';return response
 
 if __name__=='__main__': serve()
