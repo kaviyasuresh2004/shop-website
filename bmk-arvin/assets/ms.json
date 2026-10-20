@@ -421,7 +421,7 @@
   "manualOrderHelp": "Hubungi pelanggan melalui telefon atau WhatsApp untuk mengesahkan pesanan. WhatsApp membuka draf; semak dan hantarnya sendiri. Tukar status kepada processing selepas pengesahan. Membuka pautan tidak mengesahkan pesanan atau bayaran.",
   "manualConfirmationCustomer": "Kakitangan kami akan menghubungi anda melalui telefon atau WhatsApp untuk mengesahkan pesanan dan urusan penghantaran atau pengambilan.",
   "productPhoto": "Foto produk",
-  "photoHelp": "Cari inventori di atas, kemudian pilih produk. Tambah sehingga enam foto. JPEG, PNG atau WebP sehingga 5 MB dan 12 megapiksel setiap foto. Pelanggan boleh melihat semua sudut dalam butiran produk.",
+  "photoHelp": "Taip nama produk atau SKU di sini untuk mencari semua inventori, kemudian pilih item sepadan. Tambah sehingga enam foto. JPEG, PNG atau WebP, sehingga 5 MB dan 12 megapiksel setiap foto.",
   "choosePhoto": "Pilih foto",
   "uploadPhoto": "Muat naik foto dipilih",
   "photoSaved": "Foto disimpan. Pelanggan kini boleh melihatnya.",
@@ -471,5 +471,9 @@
   "filterCategory": "Tapis inventori mengikut kategori",
   "previousPage": "100 sebelumnya",
   "nextPage": "100 seterusnya",
-  "inventoryPageSummary": "Memaparkan {start}–{end} daripada {count} produk sepadan. Pilihan produk merangkumi semua item sepadan."
+  "inventoryPageSummary": "Memaparkan {start}–{end} daripada {count} produk sepadan. Pilihan produk merangkumi semua item sepadan.",
+  "photoSearchLabel": "Cari produk untuk foto",
+  "photoSearchPlaceholder": "Taip nama produk atau SKU…",
+  "photoSearchMatches": "{count} produk sepadan. Pilih produk yang betul di bawah.",
+  "photoChooseProduct": "Cari dan pilih produk dahulu."
 }

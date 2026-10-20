@@ -451,7 +451,7 @@
   "manualOrderHelp": "Contact the customer by phone or WhatsApp to confirm each pending order. WhatsApp opens a draft; review it and send it yourself. Change the order to processing after confirmation. Opening a contact link does not confirm an order or mark payment received.",
   "manualConfirmationCustomer": "Our staff will contact you by phone or WhatsApp to confirm your order and delivery or collection arrangements.",
   "productPhoto": "Product photo",
-  "photoHelp": "Search inventory above, then select the product here. Add up to six views. JPEG, PNG or WebP, up to 5 MB and 12 megapixels each. The cover photo appears in the shop; customers can browse all angles in Product details.",
+  "photoHelp": "Type a product name or SKU here to search all inventory, then select the matching item. Add up to six views. JPEG, PNG or WebP, up to 5 MB and 12 megapixels each.",
   "choosePhoto": "Choose photo",
   "uploadPhoto": "Upload selected photos",
   "photoSaved": "Photo saved. Customers can now see it.",
@@ -501,5 +501,9 @@
   "filterCategory": "Filter inventory by category",
   "previousPage": "Previous 100",
   "nextPage": "Next 100",
-  "inventoryPageSummary": "Showing {start}–{end} of {count} matching products. Product selectors include every matching item."
+  "inventoryPageSummary": "Showing {start}–{end} of {count} matching products. Product selectors include every matching item.",
+  "photoSearchLabel": "Search product for photos",
+  "photoSearchPlaceholder": "Type a product name or SKU…",
+  "photoSearchMatches": "{count} matching products. Select the correct product below.",
+  "photoChooseProduct": "Search for and select a product first."
 }
