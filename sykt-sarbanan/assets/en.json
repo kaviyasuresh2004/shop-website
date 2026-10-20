@@ -312,7 +312,7 @@
   "colSku": "SKU",
   "colName": "Name",
   "colCategory": "Category",
-  "colPrice": "Price (cents)",
+  "colPrice": "Selling price (BND)",
   "colQty": "Stock",
   "colSale": "Order ID",
   "colChannel": "Channel",
@@ -398,7 +398,7 @@
   "catalogueImportInvalid": "Please choose the prepared catalogue JSON file.",
   "catalogueImportDone": "Imported {count} products. Shop: {visible} visible, {hidden} hidden.",
   "inventorySearch": "Find inventory by name or SKU",
-  "inventorySearchHelp": "Showing up to 100 matches. Search here to filter inventory and product selectors, then update the quantity or price. Products with zero stock or no price remain hidden from the shop.",
+  "inventorySearchHelp": "Search and category filters apply to inventory and product selectors below. Browse all inventory using Previous / Next. The category assignment form changes a product’s category; it is separate from this filter.",
   "showMore": "Show more products",
   "buyNow": "Buy now",
   "regularPrice": "Regular price",
@@ -493,5 +493,13 @@
   "customerAgreedFee": "I have agreed this delivery charge with the customer.",
   "deliveryNeedsConfirmation": "Estimated delivery - confirm with customer",
   "deliveryConfirmed": "Delivery charge confirmed",
-  "colDelivery_confirmation": "Delivery confirmation"
+  "colDelivery_confirmation": "Delivery confirmation",
+  "sellingPriceBnd": "Selling price (BND)",
+  "sellingPriceTitle": "Update selling price",
+  "sellingPriceHelp": "Search inventory and filter by category above, then select a product. Enter the customer selling price in BND, for example 12.50. This saves only the price; stock and photos stay unchanged. Existing promotions are managed separately.",
+  "saveSellingPrice": "Save selling price",
+  "filterCategory": "Filter inventory by category",
+  "previousPage": "Previous 100",
+  "nextPage": "Next 100",
+  "inventoryPageSummary": "Showing {start}–{end} of {count} matching products. Product selectors include every matching item."
 }

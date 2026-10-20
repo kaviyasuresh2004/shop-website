@@ -282,7 +282,7 @@
   "colSku": "SKU",
   "colName": "Nama",
   "colCategory": "Kategori",
-  "colPrice": "Harga (sen)",
+  "colPrice": "Harga jualan (BND)",
   "colQty": "Stok",
   "colSale": "ID pesanan",
   "colChannel": "Saluran",
@@ -368,7 +368,7 @@
   "catalogueImportInvalid": "Sila pilih fail JSON katalog yang disediakan.",
   "catalogueImportDone": "{count} produk diimport. Kedai: {visible} dipaparkan, {hidden} disembunyikan.",
   "inventorySearch": "Cari inventori mengikut nama atau SKU",
-  "inventorySearchHelp": "Memaparkan sehingga 100 padanan. Cari untuk menapis inventori dan pilihan produk, kemudian kemas kini kuantiti atau harga. Produk tanpa stok atau harga disembunyikan dari kedai.",
+  "inventorySearchHelp": "Carian dan penapis kategori digunakan pada inventori dan pilihan produk di bawah. Layari semua inventori dengan Sebelum / Seterusnya. Borang kategori menetapkan kategori produk, berasingan daripada penapis ini.",
   "showMore": "Paparkan lebih banyak produk",
   "buyNow": "Beli sekarang",
   "regularPrice": "Harga biasa",
@@ -463,5 +463,13 @@
   "customerAgreedFee": "Saya telah mempersetujui caj penghantaran ini dengan pelanggan.",
   "deliveryNeedsConfirmation": "Anggaran penghantaran - sahkan dengan pelanggan",
   "deliveryConfirmed": "Caj penghantaran disahkan",
-  "colDelivery_confirmation": "Pengesahan penghantaran"
+  "colDelivery_confirmation": "Pengesahan penghantaran",
+  "sellingPriceBnd": "Harga jualan (BND)",
+  "sellingPriceTitle": "Kemas kini harga jualan",
+  "sellingPriceHelp": "Cari inventori dan tapis kategori di atas, kemudian pilih produk. Masukkan harga jualan pelanggan dalam BND, contohnya 12.50. Hanya harga disimpan; stok dan foto tidak berubah. Promosi sedia ada diurus secara berasingan.",
+  "saveSellingPrice": "Simpan harga jualan",
+  "filterCategory": "Tapis inventori mengikut kategori",
+  "previousPage": "100 sebelumnya",
+  "nextPage": "100 seterusnya",
+  "inventoryPageSummary": "Memaparkan {start}–{end} daripada {count} produk sepadan. Pilihan produk merangkumi semua item sepadan."
 }

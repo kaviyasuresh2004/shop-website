@@ -166,6 +166,15 @@ def action(kind):
     if c.execute('UPDATE products SET category=? WHERE id=?',(category,domain.integer(d['product']))).rowcount!=1:raise ValueError('Unknown product')
     domain.audit(c,user['name'],'product category updated',{'product':d['product'],'category':category})
    return jsonify(ok=True)
+  if kind=='product-price':
+   price=domain.integer(d['price']);product=domain.integer(d['product'])
+   if not 0<=price<=100000000:raise ValueError('Invalid selling price')
+   with domain.LOCK,domain.connect() as c:
+    old=c.execute('SELECT price FROM products WHERE id=?',(product,)).fetchone()
+    if not old:raise ValueError('Unknown product')
+    c.execute('UPDATE products SET price=? WHERE id=?',(price,product))
+    domain.audit(c,user['name'],'selling price updated',{'product':product,'previous_price':old['price'],'price':price})
+   return jsonify(ok=True)
   if kind=='product-photo':
    return jsonify(photos.save(domain,user,d))
   if kind=='catalogue-import':
