@@ -163,7 +163,7 @@
   "createWorker": "Cipta pekerja",
   "workerHelp": "Pekerja baharu ditugaskan kepada syarikat aktif. Gunakan kata laluan sekurang-kurangnya 8 aksara.",
   "promotionManager": "Urus promosi",
-  "promotionHelp": "Pilih produk, masukkan harga BND yang dikurangkan dan tetapkan tarikh mula serta tamat. Kedai memaparkan harga biasa dipotong, penjimatan dan waktu tamat tawaran. Gunakan carian inventori untuk mencari produk.",
+  "promotionHelp": "Pilih produk melalui carian atau butang Sebelum / Seterusnya di sini. Masukkan harga diskaun BND dan tetapkan tarikh mula dan tamat. Dalam tempoh tersebut, harga asal dipangkah bersama penjimatan dan waktu tamat. Menukar produk mengosongkan harga diskaun.",
   "promotionType": "Jenis promosi",
   "typeDiscount": "Diskaun produk",
   "typeOffer": "Tawaran istimewa",
@@ -475,5 +475,7 @@
   "photoSearchLabel": "Cari produk untuk foto",
   "photoSearchPlaceholder": "Taip nama produk atau SKU…",
   "photoSearchMatches": "{count} produk sepadan. Pilih produk yang betul di bawah.",
-  "photoChooseProduct": "Cari dan pilih produk dahulu."
+  "photoChooseProduct": "Cari dan pilih produk dahulu.",
+  "promotionProductSearch": "Cari produk untuk promosi",
+  "promotionProductPage": "Produk {start}–{end} daripada {count}. Gunakan Sebelum / Seterusnya atau taip nama produk atau SKU."
 }

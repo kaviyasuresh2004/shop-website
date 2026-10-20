@@ -163,7 +163,7 @@
   "createWorker": "Create worker",
   "workerHelp": "The new worker is assigned to the active company. Use a password of at least 8 characters.",
   "promotionManager": "Manage promotions",
-  "promotionHelp": "Choose a product, enter its reduced BND price, and set start and end dates. During that period the shop shows the regular price crossed out, savings and the offer end time. Use inventory search to find a product.",
+  "promotionHelp": "Choose a product using the search or Previous / Next buttons here. Enter its reduced BND price and set start and end dates. During that period the shop shows the regular price crossed out, savings and the offer end time. Changing the selected product clears the discount price.",
   "promotionType": "Promotion type",
   "typeDiscount": "Product discount",
   "typeOffer": "Special offer",
@@ -505,5 +505,7 @@
   "photoSearchLabel": "Search product for photos",
   "photoSearchPlaceholder": "Type a product name or SKU…",
   "photoSearchMatches": "{count} matching products. Select the correct product below.",
-  "photoChooseProduct": "Search for and select a product first."
+  "photoChooseProduct": "Search for and select a product first.",
+  "promotionProductSearch": "Search product for promotion",
+  "promotionProductPage": "Products {start}–{end} of {count}. Use Previous / Next or type a product name or SKU."
 }

@@ -1,0 +1,11 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const elements=new Map();const el=id=>{if(!elements.has(id))elements.set(id,{value:'',innerHTML:'',textContent:'',disabled:false,elements:{price:{value:''}},handlers:{},addEventListener(type,fn){this.handlers[type]=fn}});return elements.get(id)};const listeners=[];
+const c={window:{},document:{addEventListener(type,fn){listeners.push(fn)}},$ :el,esc:String,t:(k,v)=>JSON.stringify(v),String,Math,data:{products:Array.from({length:9165},(_,i)=>({id:i+1,name:'Product '+(i+1),sku:'SKU-'+(i+1),category:'Plumbing'}))}};
+vm.createContext(c);vm.runInContext(fs.readFileSync(__dirname+'/assets/staff-inventory.js','utf8'),c);c.StaffInventory=c.window.StaffInventory;vm.runInContext(fs.readFileSync(__dirname+'/assets/promotion-picker.js','utf8'),c);listeners[1]();
+assert.equal((el('promotionProduct').innerHTML.match(/<option/g)||[]).length,100);assert.equal(el('promotionPrevious').disabled,true);
+el('promotion').elements.price.value='12.50';el('promotionNext').handlers.click();assert.ok(el('promotionProduct').innerHTML.includes('Product 101'));assert.equal(el('promotion').elements.price.value,'');
+for(let i=0;i<90;i++)el('promotionNext').handlers.click();assert.ok(el('promotionProduct').innerHTML.includes('Product 9165'));assert.equal(el('promotionNext').disabled,true);
+el('promotionPrevious').handlers.click();assert.equal(el('promotionNext').disabled,false);
+el('promotionSearch').value='SKU-9165';el('promotionSearch').handlers.input();assert.equal(el('promotionProduct').value,'9165');assert.equal((el('promotionProduct').innerHTML.match(/<option/g)||[]).length,1);
+el('promotionSearch').value='not found';el('promotionSearch').handlers.input();assert.equal(el('promotionProduct').disabled,true);assert.equal(el('promotionPrevious').disabled,true);assert.equal(el('promotionNext').disabled,true);
+console.log('PASS: promotion paging through 9,165 products, typed SKU search, empty results and stale discount clearing.');
