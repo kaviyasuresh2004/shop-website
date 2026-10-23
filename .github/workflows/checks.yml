@@ -44,3 +44,5 @@ jobs:
 
       - run: node test_promotion_picker.cjs
       - run: node --check assets/promotion-picker.js
+
+      - run: node test_selling_price_ui.cjs

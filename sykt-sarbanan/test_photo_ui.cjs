@@ -14,3 +14,5 @@ element('photoSearch').value='';vm.createContext(context);vm.runInContext(fs.rea
  drop.handlers.keydown({key:'Enter',preventDefault(){}});assert.ok(element('photoFile').clicked);
  console.log('PASS: drag-and-drop selection, multi-file uploads, limits and keyboard file picker.');
 })().catch(e=>{console.error(e);process.exitCode=1});
+
+assert.ok(!fs.readFileSync(__dirname+'/assets/photos.js','utf8').includes('${esc(p.sku)}'));

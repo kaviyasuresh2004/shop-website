@@ -9,3 +9,5 @@ el('promotionPrevious').handlers.click();assert.equal(el('promotionNext').disabl
 el('promotionSearch').value='SKU-9165';el('promotionSearch').handlers.input();assert.equal(el('promotionProduct').value,'9165');assert.equal((el('promotionProduct').innerHTML.match(/<option/g)||[]).length,1);
 el('promotionSearch').value='not found';el('promotionSearch').handlers.input();assert.equal(el('promotionProduct').disabled,true);assert.equal(el('promotionPrevious').disabled,true);assert.equal(el('promotionNext').disabled,true);
 console.log('PASS: promotion paging through 9,165 products, typed SKU search, empty results and stale discount clearing.');
+
+assert.ok(!fs.readFileSync(__dirname+'/assets/promotion-picker.js','utf8').includes('${esc(p.sku)}'));

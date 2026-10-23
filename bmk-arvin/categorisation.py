@@ -1,7 +1,7 @@
 """Conservative name-based suggestions; only uncategorised products are changed."""
 import hashlib,json,re,sqlite3
 
-CATEGORIES=('Power tools','Hand tools','Building materials','Electrical','Plumbing','Paint','AC & Refrigeration','Fasteners','Safety Equipment')
+CATEGORIES=('Power tools','Hand tools','Building materials','Electrical','Plumbing','Paint','AC & Refrigeration','Fasteners','Safety Equipment','Machinery')
 RULES=[
  ('Safety Equipment',r'\b(SAFETY (HELMET|GLASS|GOGGLE|SHOE|BOOT|VEST|HARNESS)|HARD HAT|GOGGLES?|RESPIRATOR|EAR (PLUG|MUFF)|FIRE EXTINGUISHER|WORK GLOVES?|WELDING (MASK|HELMET))\b'),
  ('AC & Refrigeration',r'\b(AIR\s*CON(DITION(ER|ING))?|AIRCON(DITIONER)?|REFRIGERANT|REFRIGERATION|R\s*410A|R\s*134A|R\s*22|MANIFOLD GAUGE|VACUUM PUMP|FLARING TOOL)\b'),
