@@ -482,5 +482,8 @@
   "inventoryPageLabel": "Halaman {page}",
   "sellingPriceSearch": "Cari produk untuk kemas kini harga jualan",
   "catMachinery": "Jentera",
-  "searchPlaceholder": "Cari alat, bahan atau SKU..."
+  "searchPlaceholder": "Cari alat, bahan atau SKU...",
+  "backToProducts": "← Kembali ke produk",
+  "similarProducts": "Produk serupa",
+  "productNotFound": "Produk ini tidak lagi tersedia."
 }
