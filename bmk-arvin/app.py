@@ -2,6 +2,7 @@ import mimetypes
 import commerce
 import delivery
 import inventory
+import product_details
 import shopping
 import phone_verification
 from datetime import datetime, timezone
@@ -48,6 +49,7 @@ def init():
   commerce.initialize(c)
   delivery.initialize(c)
   inventory.initialize(c)
+  product_details.initialize(c)
   shopping.initialize(c)
   phone_verification.initialize(c)
   companies=c.execute('SELECT id,name FROM companies').fetchall()

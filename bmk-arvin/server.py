@@ -89,8 +89,9 @@ def catalog():
  user=signed_in() if request.args.get('staff')=='1' else None
  with domain.connect() as c:
   photo_urls=photos.urls(c)
+  details=domain.product_details.load_all(c)
   ids={r['id'] for r in c.execute('SELECT id FROM products') if user or domain.inventory.available(c,r['id'])}
-  return jsonify(logo_url=branding.url(c),shop_slug=domain.CONFIG['slug'],companies=[dict(r) for r in c.execute('SELECT * FROM companies')],products=[dict(r,photo_url=next(iter(photo_urls.get(r['id'],[])),''),photo_urls=photo_urls.get(r['id'],[])) for r in c.execute('SELECT * FROM products') if r['id'] in ids],stock=[dict(r) for r in c.execute('SELECT * FROM stock') if r['id'] in ids],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions WHERE active=1') if domain.promotion_valid(r)],setup=not bool(c.execute('SELECT 1 FROM users').fetchone()),setupProtected=PRODUCTION,preview=not domain.commerce.load(c,not PREVIEW)['checkout_enabled'],shopDetails=domain.commerce.load(c,not PREVIEW))
+  return jsonify(logo_url=branding.url(c),shop_slug=domain.CONFIG['slug'],companies=[dict(r) for r in c.execute('SELECT * FROM companies')],products=[dict(r,**details.get(r['id'],{}),photo_url=next(iter(photo_urls.get(r['id'],[])),''),photo_urls=photo_urls.get(r['id'],[])) for r in c.execute('SELECT * FROM products') if r['id'] in ids],stock=[dict(r) for r in c.execute('SELECT * FROM stock') if r['id'] in ids],promotions=[dict(r) for r in c.execute('SELECT * FROM promotions WHERE active=1') if domain.promotion_valid(r)],setup=not bool(c.execute('SELECT 1 FROM users').fetchone()),setupProtected=PRODUCTION,preview=not domain.commerce.load(c,not PREVIEW)['checkout_enabled'],shopDetails=domain.commerce.load(c,not PREVIEW))
 
 @web.get('/api/inventory-audit')
 def inventory_audit():
@@ -166,6 +167,8 @@ def action(kind):
     if c.execute('UPDATE products SET category=? WHERE id=?',(category,domain.integer(d['product']))).rowcount!=1:raise ValueError('Unknown product')
     domain.audit(c,user['name'],'product category updated',{'product':d['product'],'category':category})
    return jsonify(ok=True)
+  if kind=='product-details':
+   return jsonify(domain.product_details.save(domain,user,d))
   if kind=='product-price':
    price=domain.integer(d['price']);product=domain.integer(d['product'])
    if not 0<=price<=100000000:raise ValueError('Invalid selling price')
