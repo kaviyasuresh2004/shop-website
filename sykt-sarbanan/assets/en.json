@@ -512,5 +512,8 @@
   "inventoryPageLabel": "Page {page}",
   "sellingPriceSearch": "Search product to update selling price",
   "catMachinery": "Machinery",
-  "searchPlaceholder": "Search tools, materials or SKU..."
+  "searchPlaceholder": "Search tools, materials or SKU...",
+  "backToProducts": "← Back to products",
+  "similarProducts": "Similar products",
+  "productNotFound": "This product is no longer available."
 }
